@@ -12,8 +12,8 @@ http://www.tivocommunity.com/community/index.php?threads/now-playing-more-php-co
 # Setup
 Edit bin/tivo_settings.php and make the necessary changes for your environment.
 * wgetpath: path to wget
-* mymak: your TiVo MAK (media access key)
-* mysubnet: first three bytes of your local network IP addresses
+* mymak: your TiVo MAK (Media Access Key)
+* mysubnet: first three bytes of your local network IP addresses (for use in tivos array)
 * tivos: add your TiVo boxes to this array (see file for examples)
 
 There are other settings than those in the file, see the comments for details and experiment!
