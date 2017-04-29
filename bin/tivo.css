@@ -1,0 +1,18 @@
+a:hover { color: #666666; font-family: verdana; text-decoration: none; }
+a.download{ color: #336699; font-family: Verdana; font-size: 14px; font-weight: bold; padding-right: 30px; }
+a:active, a, a:visited { color: #336699; font-family: Verdana; text-decoration: none; }
+body{ background: #E6F2FF; }
+div.item{ border: 1px #336699 dotted; clear: both; color: #336699; font-family: Verdana; margin: 0px 0px 8px 0px; padding: 5px; display: none; }
+h1 { color: #225588; text-align: center; font-family: Verdana; font-size: 28px; }
+h2 { color: #336699; text-align: center; font-family: Verdana; font-size: 16px; }
+h3, .date, .dura, .stat, .srid, .epnum { color: #336699; font-family: Verdana; font-size: 14px; }
+/* summery settings */
+h4 { color: #225588; font-family: Verdana; font-size: 18px; }
+.chan{ color: #336699; font-family: Verdana; font-size: 16px; padding-right: 50px; }
+.desc{ color: #336699; font-family: Verdana; font-size: 14px; margin-top: 10px; }
+.eptitle{ color: #336699; font-family: Verdana; font-size: 14px; font-weight: bold; }
+.name{ color: #336699; font-family: Verdana; font-size: 16px; font-variant: small-caps; font-weight: bold; }
+.size{ color: #336699; float: left; font-family: Verdana; font-size: 14px; padding-right: 30px; }
+.pgid{ color: #336699; float: left; font-family: Verdana; font-size: 14px; padding-right: 10px; }
+.totaltime, .totalitems, .totalsize { border: 1px #336699; border-style: dotted; color: #336699; font-family: Verdana; font-size: 14px; font-weight: bold; margin-bottom: 20px; padding-left: 10px; padding-right: 10px; }
+.totaltimesize{ border: 1px #336699; border-style: dotted; color: #336699; font-family: Verdana; font-size: 14px; margin-bottom: 20px; padding-left: 10px; padding-right: 10px; }
