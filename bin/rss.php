@@ -1,5 +1,5 @@
 <?php
-//   RSS code cut from index.php 
+// RSS code cut from index.php 
 		$rssheader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><rss version=\"2.0\"><channel><title>" . $tivo['feedtitle'] . "</title><link>" . $tivo['feedlink'] . "</link> <description>" . $tivo['feeddescription'] . "</description>";
 		for ($i = 1;$i < count($tivoarray);$i++) {
 			$sc = explode("-", $tivoarray[$i]['sourcechannel']);
@@ -18,6 +18,8 @@
 			$rsscontent .= "Duration:" . mSecsToTime($tivoarray[$i]['duration']) . "&lt;br&gt;";
 			$rsscontent .= "</description>\n";
 			$rsscontent .= "</item>\n";
+                        $rsscontent = str_replace("Copyright Tribune Media Services, Inc.", "", $rsscontent);
+                        $rsscontent = str_replace("Copyright Rovi, Inc.", "", $rsscontent);
 		} 
 		$rssfooter .= "</channel>\n";
 		$rssfooter .= "</rss>";

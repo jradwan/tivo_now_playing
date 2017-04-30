@@ -1,20 +1,27 @@
 <?php
 /*
- * Last update 20130915 VicW (HomeUser)
- * 
- * removed un-used code and private data
- * moved auto_size tracking files from "tmp" to "log"
+ * 20130915 VicW (HomeUser)
+ *  removed un-used code and private data
+ *  moved auto_size tracking files from "tmp" to "log"
  * 
  * 2013,2013 updates VicW (HomeUser)
  *  Auto size adjustment for drives
  *  Archiving "now playing" lists
- *  Sorting of summery table
- *  Added field deleted to summery table (space not used by programs or suggestions) 
- *  Combined now playing for all DVR's
+ *  Sorting of summary table
+ *  Added field deleted to summary table (space not used by programs or suggestions) 
+ *  Combined now playing for all TiVos
  *  URL path allowing generation when HTML files are not published on local computer
  *  Other changes that I have forgot about.
  *    I added something to the program information like series ID.
  *    
+ * 20170429 jradwan (windracer)
+ *  added 'back to Summary' link at top of page
+ *  added 'expand/collapse all' label to plus icon at top of page
+ *  moved box images to separate line, removed forced resizing
+ *  added box images to ALL page listing and separators between box listings
+ *  filtered out Rovi text in program descriptions
+ *  general code cleanup
+ *  minor text/label changes
  */
 
 ini_set("max_execution_time", "180");
@@ -40,7 +47,7 @@ $month = Date('M'); // "Feb";
 $sug_log_path = "log"  . delim . $year . delim . $month . delim;
 $arch_path    = "arch" . delim . $year . delim . $month . delim;
 // $arch is directory to save a copy of archived copy of the NowPlaying html file
-// TODO elminate sug_log_path and save the summery and drive size with the archive
+// TODO elminate sug_log_path and save the summary and drive size with the archive
 
 // Make a new path for the XML files if needed.
 if(!file_exists($xml_path)) {
@@ -60,7 +67,7 @@ if(!file_exists($rootpath . $arch_path)) {
 	else print("Fail making directory ". $rootpath . $arch_path ."\n");
 }
 
-// $archdate is used to create a unique name for the archived NowPlayin html file
+// $archdate is used to create a unique name for the archived nowplaying HTML file
 $archdate = date(YmdHi); // 2012122015 YYYYMMDDHHMM timestamp appended to archived nowplaying
 
 // PHP does not type and defaults to an empty char or null force a number 0 (zero)
@@ -71,49 +78,50 @@ $allfreespace = 0;
 $alltotalitems = 0;
 $alltotallength = 0;
 $all_size_gb = 0;
-$icnt=0; // Make a unique ID to enable toggel on page with all dvrs
+$icnt = 0; // Make a unique ID to enable toggle on page with all dvrs
 
 // Make a header for the summary page
 $sum_header .= "<!DOCTYPE html>\n"; // PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
 $sum_header .= "<html><head>\n";
 $sum_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
-$sum_header .= "<sh>\n<title> SUMMARY </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
-$sum_header .= "<h2> Last Update: " . date("F j, Y, g:i a") . " </h2>\n";
+$sum_header .= "<sh>\n<title>TiVo Disk Space - Summary</title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
+$sum_header .= "<h2><img src=images/tivo_show.gif width=\"26\" height=\"26\"> Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 $sum_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n";
 $sum_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 
 // Start of sortable Summary Table
 $sum_table .= "<h4>\n<br><table id=\"Summary\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n";
-$sum_table .= " <tr> <th> TiVo </th> <th class=\"sorttable_numeric\"> Drive Size </th> <th class=\"sorttable_numeric\"> Used Space </th> <th class=\"sorttable_numeric\"> Available Space </th> <th class=\"sorttable_numeric\"> Percent Free </th> <th> suggestions </th> </tr>\n";
+$sum_table .= " <tr> <th> TiVo </th> <th class=\"sorttable_numeric\"> Drive Size </th> <th class=\"sorttable_numeric\"> Used Space </th> <th class=\"sorttable_numeric\"> Available Space </th> <th class=\"sorttable_numeric\"> Percent Free </th> <th> Suggestions </th> </tr>\n";
 // End of header for summary page
 
 
-// Heder for full list of programs for all DVR's
-$allheader .= "<!DOCTYPE html\n>"; // PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
+// Header for full list of programs from all TiVos
+$allheader .= "<!DOCTYPE html\n>"; 
 $allheader .= "<html><head>\n";
 $allheader .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
-$allheader .= "<title>" . "Now Playing All DVR'S" . "</title><link href=" . $mycss . " rel=\"stylesheet\" type=\"text/css\" ></head>\n\n";
+$allheader .= "<title>" . "All TiVos - Now Playing" . "</title><link href=" . $mycss . " rel=\"stylesheet\" type=\"text/css\" ></head>\n\n";
 $allheader .= "<body onload=\"init()\">\n";
-$allheader .= "<h1> <img src=" .$images. "tivo_show.gif width=\"26\" height=\"26\"> " . "ALL TiVo's NOW Playing" . " </h1>\n";
-$allheader .= "<h2> Last Update: " . date("F j, Y, g:i a") . " </h2>\n";
+
+// add link back to Summary page at top 
+$allheader .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary page </a></div>\n";
+
+// link to expand/collapse all entries on the page
+$allheader .= "<img src=\"" .$images. "plus.gif\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" border=\"0\" align=\"left\"><div class=\"dura\">&thinsp; expand/collapse all</div>\n";
+
+$allheader .= "<h1> <img src=" .$images. "tivo_show.gif width=\"26\" height=\"26\"> " . "All TiVos" . " </h1>\n";
+$allheader .= "<h2> Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 $allheader .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html charset=UTF-8\">";
 
 // Java script TiVo_Now_Playing.js
 $allheader .= "<script id=\"imagepath\"> \"" . $images . "\" </script>\n";
 $allheader .= "<script src=" . $mytjs . " > </script>\n";
 
-// TODO Put a label with the toggel all button
-//$content .= "<img src=\"" .$images. "pluse.gif\" id=\"toggllall\" onclick=\"toggleAll(2)\" border=\"5\">\n";
-$allheader .= "<img src=\"" .$images. "plus.gif\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" border=\"0\">\n";
-
-
-
 
 // Java script TiVo_Now_Playing.js
 $allheader .= "<script id=\"imagepath\"> \"" . $images . "\" </script>\n";
 $allcontent = "";
 
-// Loop for each TiVo defined in the array defined in tivosettings.php
+// Loop for each TiVo defined in the array defined in tivo_settings.php
 foreach($tivos as $tivo) {
 	unset($tivoarray, $totalsize, $totallength, $customicon, $sc, $totalitems, $freespace, $rssheader, $rsscontent, $rssfooter, $header, $content, $footer, $fp1, $fp2, $totalsuggestions, $totalnumsuggestions, $percent_free, $fpt, $auto_size_gb, $recording_suggestion, $sug_header, $sug_table, $sug_footer, $sug_html_file, $sug_log_file, $sug_html_file, $archNowPlaying, $nowPlaying);
 
@@ -147,7 +155,6 @@ foreach($tivos as $tivo) {
 	// $archNowPlaying copy of $nowPlaying for archiving Web pages
 	$archNowPlaying = $arch_path . $tivo['name'] . "_" . $archdate . "_nowplaying.htm";
 
-
 	// both requested and suggestions show now_recording when in progress. Any in progress
 	// recordings before the first non suggestion should be counted as used space.
 	$recording_suggestion = false;
@@ -161,28 +168,26 @@ foreach($tivos as $tivo) {
 		include($binpath . "rss.php");
 	} // end of rss
 
-
-	$header .= "<!DOCTYPE html\n>"; // PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
+	$header .= "<!DOCTYPE html\n>"; 
 	$header .= "<html><head>\n";
 	$header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
 	$header .= "<title>" . $tivo['nowplaying'] . "</title><link href=" . $tivo['css'] . " rel=\"stylesheet\" type=\"text/css\" ></head>\n\n";
 	$header .= "<body onload=\"init()\">\n";
-	// TODO
-	//$content .= "<img src=\"" .$images. "pluse.gif\" id=\"toggllall\" onclick=\"toggleAll(2)\" border=\"5\">\n";
-	$header .= "<img src=\"" .$images. "plus.gif\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" border=\"0\">\n";
 
-	// TODO
-	//$header .= "\"toggleAll(TRUE)\"";
-	// ** NEW ADDITION TO HEADER
+	// add link back to Summary page at top 
+	$header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary page </a></div>\n";
+
+	// link to expand/collapse all entries on the page
+        $header .= "<img src=\"" .$images. "plus.gif\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" border=\"0\" align=\"left\"><div class=\"dura\">&thinsp; expand/collapse all</div>\n";
+
 	if (file_exists("$image_path". "tivo_" . $tivo['model'] . ".png")){
-		$header .= "<h1> <img src=\"" .$images. "tivo_" . $tivo['model'] . ".png\" width=\"104\" height=\"26\"> " . $tivo['nowplaying'] . " </h1>\n";
+		$header .= "<h1> <img src=\"" .$images. "tivo_" . $tivo['model'] . ".png\"><br>" . $tivo['nowplaying'] . " </h1>\n";
 	} else {
 		print("missing image" . "$image_path". "tivo_" . $tivo['model'] . ".png\n");
-	 $header .= "<h1> <img src=" .$images. "tivo_show.gif width=\"26\" height=\"26\"> " . $tivo['nowplaying'] . " </h1>\n";
+	 	$header .= "<h1> <img src=" .$images. "tivo_show.gif width=\"26\" height=\"26\"><br> " . $tivo['nowplaying'] . " </h1>\n";
 	}
-	// ** END NEW ADDITION
-	$header .= "<h2> Last Update: " . date("F j, Y, g:i a") . " </h2>\n";
-	$header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">";
+	$header .= "<h2> Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
+	$header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 
 	// Java script TiVo_Now_Playing.js
 	$header .= "<script id=\"imagepath\"> \"" . $images . "\" </script>\n";
@@ -190,7 +195,7 @@ foreach($tivos as $tivo) {
 
 	$sum_table .= "<tr> "; // start of new row in the table for summary page data
 
-	if($tivoarray == null) $content .= "<center><font size=12 color=\"red\">   DVR IS OFF-LINE  </font></center>"; else
+	if($tivoarray == null) $content .= "<center><font size=12 face=verdana color=\"red\">This TiVo is currently unavailable</font></center>"; else
 		for ($i = 1;$i < count($tivoarray);$i++) {
 		$ci = $tivoarray[$i]['customicon'];
 		$customicon = explode(":", $ci);
@@ -201,8 +206,9 @@ foreach($tivos as $tivo) {
 		$tivoarray[$i]['episodetitle'] = str_replace("amp;", "", $tivoarray[$i]['episodetitle']);
 		if ($tivoarray[$i]['description'] != "") {
 			$tivoarray[$i]['description'] = str_replace("amp;", "", $tivoarray[$i]['description']);
+			$tivoarray[$i]['description'] = str_replace("Copyright Tribune Media Services, Inc.", "", $tivoarray[$i]['description']);
+			$tivoarray[$i]['description'] = str_replace("Copyright Rovi, Inc.", "", $tivoarray[$i]['description']);
 		}
-		$tivoarray[$i]['description'] = str_replace("Copyright Tribune Media Services, Inc.", "", $tivoarray[$i]['description']);
 
 		$tivoarray[$i]['content'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['content']);
 		$tivoarray[$i]['title'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['title']);
@@ -215,7 +221,6 @@ foreach($tivos as $tivo) {
 		$tivoarray[$i]['episodenumber'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['episodenumber']);
 		$tivoarray[$i]['tvrating'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['tvrating']);
 		$tivoarray[$i]['mpaarating'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['mpaarating']);
-
 
 		$content .= "<div class=\"programitem\">\n";
 		if ($gfxicons == 1) {
@@ -232,12 +237,9 @@ foreach($tivos as $tivo) {
 			$content .= "<a href=\"http://www.imdb.com/find?q=" . $imdb . ";tt=on;nm=on;mx=20\" target=\"_blank\"><img src=\"" .$images. "imdb.gif\" border=\"0\" width=\"16\" height=\"16\"></a>\n";
 		}
 
-
 		if ($disablexmllinks == 0){
 			$content .= "<a href=" . $tivoarray[$i]['tivovideodetails'] . ">";
 		}
-
-
 
 		$content .= "<span class=\"name\">" . $tivoarray[$i]['title'] . "</span>";
 
@@ -259,15 +261,14 @@ foreach($tivos as $tivo) {
 		// Program programid, series and episode information
 		$content .= "<div class=\"pgid\">ProgramId: " . $tivoarray[$i]['programid'] . "</div>\n";
 		$content .= "<div class=\"srid\">SeriesId: " . $tivoarray[$i]['seriesid'] . "</div>\n";
-		if($tivoarray[$i]['episodenumber'] > 0)	// New2
+		if($tivoarray[$i]['episodenumber'] > 0)	
 			$content .= "<div class=\"epnum\">EpisodeNumber: " . $tivoarray[$i]['episodenumber'] . "</div>\n";
 
-		if($tivoarray[$i]['tvrating'] > 0)	// New2
+		if($tivoarray[$i]['tvrating'] > 0)
 			$content .= "<div class=\"epnum\">TvRating: " . $tivoarray[$i]['tvrating'] . "</div>\n";
 
-		if($tivoarray[$i]['mpaarating'] > 0)	// New2
+		if($tivoarray[$i]['mpaarating'] > 0)
 			$content .= "<div class=\"epnum\">MPAARating: " . $tivoarray[$i]['mpaarating'] . "</div>\n";
-
 
 		$content .= "<br>\n";
 
@@ -305,7 +306,7 @@ foreach($tivos as $tivo) {
 	if($tivoarray == null){ // Avoid null values when DVR is off-line
 		$totalitems = 0; $freespace = 0; $percent_free = 0.0; $totalsize = 0; $totallength=0; $totalsuggestions = 0;
 	} else {
-		// Jic adjust for drive size entered too small use total recorded size
+		// adjust for drive size entered too small use total recorded size
 		$auto_size_gb = $tivo['size_gb'];
 		$auto_size_file_name = ("log". delim . $tivo['name'] . "_drive_size.php");
 
@@ -333,7 +334,7 @@ foreach($tivos as $tivo) {
 			// ToDo find some way to update the settings file.
 		}
 		$totalitems = $tivoarray[0]['totalitems'];
-		// # Changed to use a better description instead of model using size_gb
+		// Changed to use a better description instead of model using size_gb
 		// $freespace = ((intval(trim($tivo['model']))) * 1024) - toMB($totalsize);
 		$freespace = ((intval(trim($tivo['size_gb']))) * 1024) - toMB($totalsize);
 
@@ -355,8 +356,9 @@ foreach($tivos as $tivo) {
 
 	$footer .= "</div>\n";
 
-	// Add a link to the summery page
-	$footer .= "<a href=\"" . $myurl . "summary.htm\" >&larr; back to Summary page </a>";
+	// add a link to the summary page
+	$footer .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary page </a></div>\n";
+
 	$footer .= "</body></html>";
 	$fp1 = @fopen($nowPlaying, "w");
 	fwrite($fp1, $header . $content . $footer);
@@ -370,7 +372,6 @@ foreach($tivos as $tivo) {
 	fwrite($fpt,"\$auto_size_gb = \"" . $tivo['size_gb'] . "\";\n" );
 	fclose($fpt);
 	// End of Debug logging code
-	
 	
 	/*
 	 * 
@@ -396,13 +397,13 @@ foreach($tivos as $tivo) {
 		fwrite($fpt, "<td sorttable_customkey=\"" . $totalsuggestions . "\">(" . $totalnumsuggestions . ") " . toGB($totalsuggestions) . " GB</td></tr>\n" );
 		fclose($fpt);
 
-
 		// Make a header for the summary of suggestions page
-		$sug_header .= "<!DOCTYPE html>\n"; // PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
+		$sug_header .= "<!DOCTYPE html>\n";
 		$sug_header .= "<html><head>\n";
 		$sug_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
-		$sug_header .= "</head><body><sh>\n<title> Suggestions SUMMARY </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
-		$sug_header .= "<h2> Last Update: " . date("F j, Y, g:i a") . " </h2>\n";
+		$sug_header .= "</head><body><sh>\n<title> Suggestions Summary </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
+		$sug_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" > &larr;&thinsp; back to Summary page </a></div>";
+		$sug_header .= "<h2> Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 		$sug_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 		$sug_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>";
 		// Create the table and add data from the log file
@@ -412,17 +413,13 @@ foreach($tivos as $tivo) {
 		$sug_table .= file_get_contents($sug_log_file);
 		$sug_table .= "</table></h4>\n";
 
-		$sug_footer .= "<a href=\"" . $myurl . "summary.htm\" > &larr; back to Summary page </a>";
+		$sug_footer .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" > &larr;&thinsp; back to Summary page </a></div>";
 		$sug_footer .= "</body></html>";
 
 		$fpt1 = @fopen($sug_html_file, 'w');
 		fwrite($fpt1, $sug_header . $sug_table . $sug_footer);
 		fclose($fpt1);
 	} // once an hour
-	
-	
-	
-	
 	
 	/// **************************** Suggestions Table
 
@@ -457,28 +454,31 @@ foreach($tivos as $tivo) {
 
 	$sum_table .= "</tr>\n";
 
+	$allcontent .= "<br><hr>\n";
+	if (file_exists("$image_path". "tivo_" . $tivo['model'] . ".png")){
+		$allcontent .= "<h1> <img src=\"" .$images. "tivo_" . $tivo['model'] . ".png\"><br>" . $tivo['nowplaying'] . " </h1>\n";
+	} else {
+		print("missing image" . "$image_path". "tivo_" . $tivo['model'] . ".png\n");
+	 	$allcontent .= "<h1> <img src=" .$images. "tivo_show.gif width=\"26\" height=\"26\"><br> " . $tivo['nowplaying'] . " </h1>\n";
+	}
 	//TODO alternate colors for each DVR or some way to label which DVR the program is on
-	$allcontent .= " <h1>" . $tivo['nowplaying'] . " </h1>\n";
-
 	$allcontent .= $content;	// add content to list of all recordings web page
 
-	$alltotalsize += $totalsize;
-	$alltotalsuggestions += $totalsuggestions;
+	$alltotalsize 		+= $totalsize;
+	$alltotalsuggestions 	+= $totalsuggestions;
 	$alltotalnumsuggestions += $totalnumsuggestions;
-	$allfreespace += $freespace;
-	$alltotalitems +=$totalitems;
-	$alltotallength += $totallength;
-	$all_size_gb += $tivo['size_gb'];
+	$allfreespace 		+= $freespace;
+	$alltotalitems 		+=$totalitems;
+	$alltotallength 	+= $totallength;
+	$all_size_gb 		+= $tivo['size_gb'];
 
 } // End of foreach tivo
-
 
 $allpercent_free .= floor((mBtoGB($allfreespace) /$all_size_gb)  * 1000)/10;;
 
 /*
- * Add All totals to a line on sommery table
+ * Add All totals to a line on summary table
  */
-//
 $nowPlaying = "alldvrs.htm";
 $sum_table .= "<tr> "; // start of new row in the table for summary page data
 $sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\" >" . "ALL" . "</a> </td>";
@@ -500,18 +500,16 @@ $sum_table .= "</tr>\n";
 // end of add all totals
 
 /*
- *
- *  Save totals and summery
- *
+ *  Save totals and summary
  */
- // save the summery table
-$sum_table .= "</table>\n</h4>\n";
+// save the summary table
+$sum_table  .= "</table>\n</h4>\n";
 $sum_footer .= "</body></html>";
 $fp1 = @fopen("summary.htm" , "w");
 fwrite($fp1, $sum_header . $sum_table . $sum_footer );
 fclose($fp1);
 
-// footer for all DVR's
+// footer for all TiVos
 $allfooter .= "<br>\n";
 $allfooter .= "<div class=\"programitem\">\n";
 $allfooter .= "<div class=\"totalitems\">Total Number of Items: " . $alltotalitems . "</div>\n";
@@ -524,12 +522,12 @@ $allfooter .= "<div class=\"totalsize\">Available Space (including Suggestions):
 
 $allfooter .= "</div>\n";
 
-// Add a link to the summery page
-$allfooter .= "<a href=\"" . $myurl . "summary.htm\" >&larr; back to Summary page </a>";
+// add a link to the summary page
+$allfooter .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary page </a></div>";
 $allfooter .= "</body></html>";
-// end of footer for all DVR's
+// end of footer for all TiVos
 
-// all DVR's
+// all TiVos
 $fp1 = @fopen($nowPlaying , "w");
 fwrite($fp1, $allheader . $allcontent . $allfooter );
 fclose($fp1);

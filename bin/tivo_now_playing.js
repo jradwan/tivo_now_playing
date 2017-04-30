@@ -1,5 +1,5 @@
 
-imagePath = "images/"; // Default image path JIC.
+imagePath = "images/"; // Default image path 
 function init()
 {
      //console.log("document.domain = " + document.domain);
@@ -21,7 +21,7 @@ function init()
 
 
     // Get the name cookie.value from the title that supports more then one TiVo
-     if(document.title == '') document.title = "collapse_obj"; //FWTGBITN
+     if(document.title == '') document.title = "collapse_obj"; 
 
      var cookie = getCookie(document.title);
 

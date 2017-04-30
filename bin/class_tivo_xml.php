@@ -1,6 +1,6 @@
 <?php
 
-// The data downloaded from the DVR(s) expires in 
+// The data downloaded from the TiVo expires in:
 $mincycle = (60 * 10);			// 10 minutes *default*
 //$mincycle = (60 * 30);		// 30 minutes
 //$mincycle = (60 * 60);		// 1 hour
@@ -75,8 +75,6 @@ class Tivo_XML {
 		 print("OhOh!\n");
 		 $this->xml_path = "xml" . delim;
 		}
-		// TODO check if directory exists and make one if not
-		// print("Goody $xml_path \n");
 
 		$items = array();
 		$depth = 0;
@@ -98,10 +96,7 @@ class Tivo_XML {
 
 		if (file_exists($xml_path . $this->dvr . "_nowplaying" . $more . ".xml")) {
 			$timedif = @(time() - filemtime($xml_path . $this->dvr . "_nowplaying" . $more . ".xml"));
-//$mincycle = (60 * 10);  // 10 minutes
-//$mincycle = (60 * 30); // 30 minutes
-//$mincycle = (60 * 60)*72;  // 2 hours
-			global $mincycle;  // So it can be defined at the top of the file and easly changed.					
+			global $mincycle;  // defined at the top of the file and easly changed
 			if ($timedif > $mincycle) {
 				$nowplayingresult = system($wgetnp, $retval);
 			} 
@@ -127,9 +122,6 @@ class Tivo_XML {
 		$count = 0;
 		do {
 			$this->parser = xml_parser_create();
-			# PHP Fatal error: Call-time pass-by-reference has been removed in class_tivo_xml.pho on line 111
-			# Broken in V6 
-			# xml_set_object($this->parser, &$this);
 			xml_set_object($this->parser, $this);
 
 			xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING, false);
@@ -190,48 +182,19 @@ class Tivo_XML {
 			$currenttag = $name;
 		} 
 
-// WHY The extra code?
-//		if ($name == "Content" && $depth == 4) {
-//			$name = "Url";
-//			$ndepth = 5;
-//			if ($name == "Url" && $ndepth == 5) {
-//				$name = "Content";
-//				$currenttag = $name;
-//			} 
-//		} 
-
 		if ($name == "Content" && $depth == 4) {
 			$ndepth = 5;
 			$currenttag = $name;		} 
 
-// WHY The extra code?
-//		if ($name == "CustomIcon" && $depth == 4) {
-//			$name = "Url";
-//			$ndepth = 5;
-//			if ($name == "Url" && $ndepth == 5) {
-//				$name = "CustomIcon";
-//				$currenttag = $name;
-//			} 
-//		} 
 		if ($name == "CustomIcon" && $depth == 4) {
 			$ndepth = 5;
 			$currenttag = $name;
 		} 
 
-// WHY The extra code?
-//		if ($name == "TiVoVideoDetails" && $depth == 4) {
-//			$name = "Url";
-//			$ndepth = 5;
-//			if ($name == "Url" && $ndepth == 5) {
-//				$name = "TiVoVideoDetails";
-//				$currenttag = $name;
-//			} 
-//		} 
 		if ($name == "TiVoVideoDetails" && $depth == 4) {
 			$ndepth = 5;
 			$currenttag = $name;
 		} 
-
 
 		if ($name == "SourceSize" && $depth == 4) {
 			$currenttag = $name;
@@ -267,12 +230,9 @@ class Tivo_XML {
 		if ($name == "TvRating" && $depth == 4) {
 			$currenttag = $name;
 		} 
-		// New2
 		if ($name == "MpaaRating" && $depth == 4) {
 			$currenttag = $name;
 		} 
-
-		// END NEW  END NEW  END NEW  END NEW  END NEW  END NEW 
 	} 
 
 	function _tivoend_element($parser, $name)
@@ -368,7 +328,7 @@ class Tivo_XML {
 				$items[0]['tcitemcount'] = $data;
 				$currenttag = "";
 				break;
-		// NEW Prep for folders (also I find this info usefull)
+			// NEW Prep for folders (also I find this info usefull)
 			case "ProgramId":
 				$items[$itemcount]['programid'] = $data;
 				$currenttag = "";
@@ -385,20 +345,15 @@ class Tivo_XML {
 				$items[$itemcount]['tvrating'] = $data;
 				$currenttag = "";
 				break;
-			// New2
 			case "MpaaRating":
 				$items[$itemcount]['mpaarating'] = $data;
 				$currenttag = "";
 				break;
-
-		// END NEW  END NEW  END NEW  END NEW  END NEW  END NEW 
-
 			default:
 				break;
 		} 
 	} 
 }
-
  
 /*
  * 	Overcome PHPv4 limitations mkdir not supporting recursion
@@ -412,7 +367,6 @@ function mkdirV4($dir_name = null, $mode = 0777, $recursive = false){
     return false;
  }
 
- //print("Making $dir_name mode $mode "); if($recursive)print("TRUE\n"); else print("FALSE\n");
   if($recursive){
     $check_dir = "";
     $dirs = explode('/', $dir_name);
@@ -431,8 +385,8 @@ function mkdirV4($dir_name = null, $mode = 0777, $recursive = false){
     return is_dir($dir_name);
   } else {
     return mkdir($dir_name, $mode);
-  } // if($recursive)
-} // function mkdirV4
+  } 
+} 
 
 
 ?>
