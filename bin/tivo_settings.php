@@ -12,8 +12,8 @@
  */
 $root_path = "." . delim;	//The full path so PHP can find its assosiated files. relative locations may me used
 $image_path = $root_path . "images" . delim ; // file path to images TODO get the images from an external source
-$xml_path = "xml/"; // Temporary location for data downloaded from DVR's may be shared with other instances of index.php
-// Locaition and running options for the wget program
+$xml_path = "xml/"; // Temporary location for data downloaded from TiVos may be shared with other instances of index.php
+// Location and running options for the wget program
 define("wgetpath", delim . "usr" . delim . "local" . delim . "bin" . delim . "wget --no-check-certificate");
 define("tivoport", "80");
 
@@ -43,16 +43,16 @@ $mycss = $mybin . "tivo.css"; 	// HTML path for css used in main pages
 $summary_css = $mycss;		// HTML path for css used in the summary table page
 
 /*
- *  Settings for the TiVo DVR's can be over-ridden for each DVR
+ *  Settings for the TiVos can be overridden for each box
  */
-$mymak    = "1234567890";	// MAK address for your TiVo's find it on-line or in settings on the DVR
+$mymak    = "1234567890";	// MAK address for your TiVo; find it online or in settings on the TiVo
 $mysubnet = "192.168.1";	// First 3 quads of the IP address Saves typing (and typo errors)
 $mywrn    = "15";		// When % free space gets below this value color changes to yellow 
 $mycrit   = "10";		// Below this value color changes to red
 
 /*
- *  Settings for each DVR monitored
- *  Note: size_gb will be adjusted upward as drive gets full. Auto size can be over-ridden see log/$name$_drive_size.php
+ *  Settings for each TiVo monitored
+ *  Note: size_gb will be adjusted upward as drive gets full. Auto size can be overridden see log/$name$_drive_size.php
  */
 $tivos = array(
 	//
