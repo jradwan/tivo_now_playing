@@ -1,0 +1,35 @@
+#!/usr/bin/php
+<?php
+if ($argc < 4) {
+  echo "Usage: check_tivo_freespace <warning> <critical> <tivo>\n";
+  exit;
+}
+
+$warning = $argv[1];
+$critical = $argv[2];
+$tivo = $argv[3];
+
+// url should match $myurl in tivo_settings.php
+$url = "" . $tivo . "_nowplaying.htm";
+$response = file_get_contents($url);
+if (!$response) {
+  echo "CRITICAL - Unable to read $url\n";
+  exit(2);
+}
+if (!preg_match("/Available Space \(including Suggestions\)\: \d+.\d*\sGB\s\((\d+.\d*).\)*/",$response, $matches)) {
+  echo "CRITICAL - Unable to find Available Space in $url\n";
+  exit(2);
+}
+
+$freespace = intval($matches[1]);
+if ($freespace < $critical) {
+  echo "CRITICAL - $freespace% is less than $critical% free\n";
+  exit(2);
+} else if ($freespace < $warning) {
+  echo "WARNING - $freespace% is less than $warning% free\n";
+  exit(1);
+} else {
+  echo "OK - $freespace% is at least $warning% free\n";
+  exit(0);
+}
+?>
