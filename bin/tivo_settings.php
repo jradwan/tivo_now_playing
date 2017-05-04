@@ -68,10 +68,11 @@ $tivos = array(
 /*
  * 	Other options
  */
-$dorss = 0; 			//0 or 1 : create rss files
-$disabledownloadlinks = 1; 	//0 or 1 : 0 = show download links in html
-$disablexmllinks = 1; 		//0 or 1 : hyperlink 0 = show title to xml data
-$gfxicons = 0; 			//0 or 1 : use graphic icons (tivo logos)
-$imdblinks = 1; 		//0 or 1 : create additional image w/links to imdb.com
+$dorss = 0; 			// 0 or 1 : create rss files
+$disabledownloadlinks = 1; 	// 0 or 1 : 0 = show download links in html
+$disablexmllinks = 1; 		// 0 or 1 : hyperlink 0 = show title to xml data
+$gfxicons = 0; 			// 0 or 1 : use graphic icons (tivo logos)
+$imdblinks = 1; 		// 0 or 1 : create additional image w/links to imdb.com
+$nplarchives = 0;		// 0 or 1 : 0 = no NPL archiving; 1 = archiving enabled
 
 ?>

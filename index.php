@@ -22,7 +22,10 @@
  *  filtered out Rovi text in program descriptions
  *  general code cleanup
  *  minor text/label changes
- */
+ *
+ * 20170503 jradwan (windracer)
+ *  made archiving/logging a configurable option
+*/
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -39,36 +42,39 @@ $binpath = "bin" . delim;  // Defined here to find the settings file.
 require_once($binpath . "tivo_settings.php");
 require_once($binpath . "class_tivo_xml.php");
 
-//*TODO* Set an optional limit of number of archives to make.
-// Each month create a new archive folder.
-$year = Date('Y'); //$year = "2013";
-$month = Date('M'); // "Feb";
-
-$sug_log_path = "log"  . delim . $year . delim . $month . delim;
-$arch_path    = "arch" . delim . $year . delim . $month . delim;
-// $arch is directory to save a copy of archived copy of the NowPlaying html file
-// TODO elminate sug_log_path and save the summary and drive size with the archive
-
 // Make a new path for the XML files if needed.
 if(!file_exists($xml_path)) {
 	if(mkdirV4($xml_path, 0777, true)) print("Success Xml path\n");
 	else print("Fail making directory ". $xml_path."\n");
 }
 
-// Make a new path for the time date paths if needed.
-if(!file_exists($sug_log_path)) {
-	if(mkdirV4($sug_log_path, 0777, true)) print("Success Log path\n");
-	else print("Fail making directory ". $sug_log_path."\n");
-}
+// set up archiving-related variables and paths if enabled
+if($nplarchives == 1) {
+	//*TODO* Set an optional limit of number of archives to make.
+	// Each month create a new archive folder.
+	$year = Date('Y'); //$year = "2013";
+	$month = Date('M'); // "Feb";
 
-// Make a new path for the archives if needed
-if(!file_exists($rootpath . $arch_path)) {
-	if(mkdirV4($rootpath . $arch_path, 0777, true)) print("Success Archive path\n");
-	else print("Fail making directory ". $rootpath . $arch_path ."\n");
-}
+	// $arch is directory to save a copy of archived copy of the NowPlaying html file
+	// TODO elminate sug_log_path and save the summary and drive size with the archive
+	$sug_log_path = "log"  . delim . $year . delim . $month . delim;
+	$arch_path    = "arch" . delim . $year . delim . $month . delim;
 
-// $archdate is used to create a unique name for the archived nowplaying HTML file
-$archdate = date(YmdHi); // 2012122015 YYYYMMDDHHMM timestamp appended to archived nowplaying
+	// Make a new path for the time date paths if needed.
+	if(!file_exists($sug_log_path)) {
+		if(mkdirV4($sug_log_path, 0777, true)) print("Success Log path\n");
+		else print("Fail making directory ". $sug_log_path."\n");
+	}	
+
+	// Make a new path for the archives if needed
+	if(!file_exists($rootpath . $arch_path)) {
+		if(mkdirV4($rootpath . $arch_path, 0777, true)) print("Success Archive path\n");
+		else print("Fail making directory ". $rootpath . $arch_path ."\n");
+	}
+
+	// $archdate is used to create a unique name for the archived nowplaying HTML file
+	$archdate = date(YmdHi); // 2012122015 YYYYMMDDHHMM timestamp appended to archived nowplaying
+}
 
 // PHP does not type and defaults to an empty char or null force a number 0 (zero)
 $alltotalsize = 0;
@@ -91,7 +97,11 @@ $sum_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=U
 
 // Start of sortable Summary Table
 $sum_table .= "<h4>\n<br><table id=\"Summary\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n";
-$sum_table .= " <tr> <th> TiVo </th> <th class=\"sorttable_numeric\"> Drive Size </th> <th class=\"sorttable_numeric\"> Used Space </th> <th class=\"sorttable_numeric\"> Available Space </th> <th class=\"sorttable_numeric\"> Percent Free </th> <th> Suggestions </th> </tr>\n";
+$sum_table .= " <tr> <th> TiVo </th> <th class=\"sorttable_numeric\"> Drive Size </th> <th class=\"sorttable_numeric\"> Used Space </th> <th class=\"sorttable_numeric\"> Available Space </th> <th class=\"sorttable_numeric\"> Percent Free </th> ";
+if($nplarchives == 1) {
+	$sum_table .= "<th> Suggestions </th>";
+}
+$sum_table .= "</tr>\n";
 // End of header for summary page
 
 
@@ -142,18 +152,20 @@ foreach($tivos as $tivo) {
 	$totalnumsuggestions = 0;
 	$totalsuggestions = 0;
 
-	// Use suggestions to track free space vs unused space
-	// $sug_html_file Web page with table tracking number of suggestions and free space
-	$sug_html_file  = $sug_log_path . $tivo['name'] . "_suggestions.html";
-
-	// $sug_log_file the big file with running history
-	$sug_log_file   =  $sug_log_path . $tivo['name'] . "_track_suggestions.log";
-
 	// $nowPlaying Web page for the now playing list
 	$nowPlaying 	= $tivo['name'] . "_nowplaying.htm";
 
-	// $archNowPlaying copy of $nowPlaying for archiving Web pages
-	$archNowPlaying = $arch_path . $tivo['name'] . "_" . $archdate . "_nowplaying.htm";
+	if($nplarchives == 1) {
+		// Use suggestions to track free space vs unused space
+		// $sug_html_file Web page with table tracking number of suggestions and free space
+		$sug_html_file  = $sug_log_path . $tivo['name'] . "_suggestions.html";
+
+		// $sug_log_file the big file with running history
+		$sug_log_file   =  $sug_log_path . $tivo['name'] . "_track_suggestions.log";
+
+		// $archNowPlaying copy of $nowPlaying for archiving Web pages
+		$archNowPlaying = $arch_path . $tivo['name'] . "_" . $archdate . "_nowplaying.htm";
+	}
 
 	// both requested and suggestions show now_recording when in progress. Any in progress
 	// recordings before the first non suggestion should be counted as used space.
@@ -372,56 +384,58 @@ foreach($tivos as $tivo) {
 	fwrite($fpt,"\$auto_size_gb = \"" . $tivo['size_gb'] . "\";\n" );
 	fclose($fpt);
 	// End of Debug logging code
-	
-	/*
-	 * 
-	 *  Archive loop Update once in the first 15 minutes of the hour
-	 *
-	 *  TODO prevent update if run twice in the 15 minutes
-	 *  
-	 */
-	if(date("i") < 16) { // update log only once an hour in the first 15 minutes
-		// Track history in a log file in a table body format
-		copy($nowPlaying, $rootpath . $archNowPlaying);
-		$fpt = @fopen($sug_log_file, 'a');
-		fwrite($fpt, "<tr><td>" ."<a href=" . $myurl . $archNowPlaying .">" . $tivo['shorttitle'] .  "</a> </td>");
 
-		// new with link
-		fwrite($fpt, "<td sorttable_customkey=\"". date("YmdHi") ."\">" . date("M j, Y, H:i") .  "</td>");
-		//fwrite($fpt, "<td>" . toGB($totalsize) . " GB" . "</td>" );
-		fwrite($fpt, "<td>" . $tivo['size_gb'] . " GB" . "</td>" );
-		fwrite($fpt, "<td>" . mBtoGB($freespace) . " GB"  . "</td>" );
-		// Rounding added Dec 11 2012
-		fwrite($fpt, "<td>" . floor((mBtoGB($freespace) - toGB($totalsuggestions)) * 100) / 100 . " GB</td>" );
+	if($nplarchives == 1) {	
+		/*
+	 	* 
+	 	*  Archive loop Update once in the first 15 minutes of the hour
+	 	*
+	 	*  TODO prevent update if run twice in the 15 minutes
+	 	*  
+	 	*/
+		if(date("i") < 16) { // update log only once an hour in the first 15 minutes
+			// Track history in a log file in a table body format
+			copy($nowPlaying, $rootpath . $archNowPlaying);
+			$fpt = @fopen($sug_log_file, 'a');
+			fwrite($fpt, "<tr><td>" ."<a href=" . $myurl . $archNowPlaying .">" . $tivo['shorttitle'] .  "</a> </td>");
 
-		fwrite($fpt, "<td sorttable_customkey=\"" . $totalsuggestions . "\">(" . $totalnumsuggestions . ") " . toGB($totalsuggestions) . " GB</td></tr>\n" );
-		fclose($fpt);
+			// new with link
+			fwrite($fpt, "<td sorttable_customkey=\"". date("YmdHi") ."\">" . date("M j, Y, H:i") .  "</td>");
+			//fwrite($fpt, "<td>" . toGB($totalsize) . " GB" . "</td>" );
+			fwrite($fpt, "<td>" . $tivo['size_gb'] . " GB" . "</td>" );
+			fwrite($fpt, "<td>" . mBtoGB($freespace) . " GB"  . "</td>" );
+			// Rounding added Dec 11 2012
+			fwrite($fpt, "<td>" . floor((mBtoGB($freespace) - toGB($totalsuggestions)) * 100) / 100 . " GB</td>" );
 
-		// Make a header for the summary of suggestions page
-		$sug_header .= "<!DOCTYPE html>\n";
-		$sug_header .= "<html><head>\n";
-		$sug_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
-		$sug_header .= "</head><body><sh>\n<title> Suggestions Summary </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
-		$sug_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" > &larr;&thinsp; back to Summary page </a></div>";
-		$sug_header .= "<h2> Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
-		$sug_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
-		$sug_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>";
-		// Create the table and add data from the log file
-		$sug_table .= "<h4>\n<br><table id=\"Suggestions\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n";
-		$sug_table .= " <tr> <th> TiVo </th> <th> Date </th> <th class=\"sorttable_numeric\"> Drive Size </th> <th class=\"sorttable_numeric\"> Free Space </th> <th class=\"sorttable_numeric\"> Deleted </th> <th> Suggestions </th> </tr>\n";
+			fwrite($fpt, "<td sorttable_customkey=\"" . $totalsuggestions . "\">(" . $totalnumsuggestions . ") " . toGB($totalsuggestions) . " GB</td></tr>\n" );
+			fclose($fpt);
 
-		$sug_table .= file_get_contents($sug_log_file);
-		$sug_table .= "</table></h4>\n";
+			// Make a header for the summary of suggestions page
+			$sug_header .= "<!DOCTYPE html>\n";
+			$sug_header .= "<html><head>\n";
+			$sug_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
+			$sug_header .= "</head><body><sh>\n<title> Suggestions Summary </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
+			$sug_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" > &larr;&thinsp; back to Summary page </a></div>";
+			$sug_header .= "<h2> Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
+			$sug_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
+			$sug_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>";
+			// Create the table and add data from the log file
+			$sug_table .= "<h4>\n<br><table id=\"Suggestions\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n";
+			$sug_table .= " <tr> <th> TiVo </th> <th> Date </th> <th class=\"sorttable_numeric\"> Drive Size </th> <th class=\"sorttable_numeric\"> Free Space </th> <th class=\"sorttable_numeric\"> Deleted </th> <th> Suggestions </th> </tr>\n";
 
-		$sug_footer .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" > &larr;&thinsp; back to Summary page </a></div>";
-		$sug_footer .= "</body></html>";
+			$sug_table .= file_get_contents($sug_log_file);
+			$sug_table .= "</table></h4>\n";
 
-		$fpt1 = @fopen($sug_html_file, 'w');
-		fwrite($fpt1, $sug_header . $sug_table . $sug_footer);
-		fclose($fpt1);
-	} // once an hour
-	
-	/// **************************** Suggestions Table
+			$sug_footer .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" > &larr;&thinsp; back to Summary page </a></div>";
+			$sug_footer .= "</body></html>";
+
+			$fpt1 = @fopen($sug_html_file, 'w');
+			fwrite($fpt1, $sug_header . $sug_table . $sug_footer);
+			fclose($fpt1);
+		} // once an hour
+
+		/// **************************** Suggestions Table
+	} // end $nplarchives == 1 check
 
 	// For summary Table
 	if($tivoarray == null){		// If TiVo DVR is off line create a place holder
@@ -445,10 +459,12 @@ foreach($tivos as $tivo) {
 		else  $sum_table .= "<td>";
 		$sum_table .= $percent_free . "%</td>";
 
-		if($totalnumsuggestions < 10) $sum_table .= "<td bgcolor = \"red\">";
-		else if($totalnumsuggestions < 20) $sum_table .= "<td bgcolor = \"yellow\">";
-		else $sum_table .= "<td>";
-		$sum_table .="<a href=" . $sug_html_file . " title=\"Now Playing History\">" .$totalnumsuggestions . "</a></td>";
+		if($nplarchives ==1) {
+			if($totalnumsuggestions < 10) $sum_table .= "<td bgcolor = \"red\">";
+			else if($totalnumsuggestions < 20) $sum_table .= "<td bgcolor = \"yellow\">";
+			else $sum_table .= "<td>";
+			$sum_table .="<a href=" . $sug_html_file . " title=\"Now Playing History\">" .$totalnumsuggestions . "</a></td>";
+		}
 	}
 	// End of Table
 
@@ -492,10 +508,12 @@ else if($tivo['warning'] > $allpercent_free) $sum_table .= "<td bgcolor = \"yell
 else  $sum_table .= "<td>";
 $sum_table .= $allpercent_free . "%</td>";
 
-if($alltotalnumsuggestions < 10) $sum_table .= "<td bgcolor = \"red\">";
-else if($alltotalnumsuggestions < 20) $sum_table .= "<td bgcolor = \"yellow\">";
-else $sum_table .= "<td>";
-$sum_table .= $alltotalnumsuggestions . "</td>";
+if($nplarchives == 1) {
+	if($alltotalnumsuggestions < 10) $sum_table .= "<td bgcolor = \"red\">";
+	else if($alltotalnumsuggestions < 20) $sum_table .= "<td bgcolor = \"yellow\">";
+	else $sum_table .= "<td>";
+	$sum_table .= $alltotalnumsuggestions . "</td>";
+}
 $sum_table .= "</tr>\n";
 // end of add all totals
 
