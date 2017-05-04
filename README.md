@@ -1,5 +1,5 @@
 # TiVo Now Playing (PHP)
-Retrieve your Now Playing data from your TiVo(s) and display it as either HTML, XML or RSS.
+Retrieve the Now Playing data from your TiVo(s) and display it as either HTML, XML or RSS.
 
 As originally developed by gonzotek and clam729 on the TiVo Community Forum:
 
