@@ -9,6 +9,14 @@ And then further developed and enhanced by other members of TCF:
 
 http://www.tivocommunity.com/community/index.php?threads/now-playing-more-php-code-part-ii.371838/
 
+Summary page:
+
+![npl-summary](https://github.com/jradwan/tivo_now_playing/blob/master/images/screenshot-summary.png)
+
+Now Playing page:
+
+![npl-details](https://github.com/jradwan/tivo_now_playing/blob/master/images/screenshot-npl.png)
+
 # Setup
 Edit bin/tivo_settings.php and make the necessary changes for your environment.
 * wgetpath: path to wget
