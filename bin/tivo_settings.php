@@ -59,7 +59,6 @@ $tivos = array(
 $dorss = 0; 			// 0 or 1 : create RSS files
 $disabledownloadlinks = 1; 	// 0 or 1 : 0 = show download links in HTML
 $disablexmllinks = 1; 		// 0 or 1 : 0 = make show title hyperlink to XML data	
-$gfxicons = 0; 			// 0 or 1 : use graphic icons (tivo logos)
 $imdblinks = 1; 		// 0 or 1 : create additional image w/links to imdb.com
 $nplarchives = 0;		// 0 or 1 : 0 = no NPL archiving; 1 = archiving enabled
 

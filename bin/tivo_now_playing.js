@@ -100,12 +100,7 @@ function showHide(num)
      var strPlusMinusObjectName  = new String('plusminus' + num);
      var objToggleItem          = null;
      var objPlusMinusImage      = null;
-// var imagePath = "/tnpl/images/";
 
-     //*****************************
-     var gfxicons = false; //true or false
-     //*****************************
-	 	
      objToggleItem = getItem(strCollapseObjectName);
      objPlusMinusImage = getItem(strPlusMinusObjectName);
 
@@ -116,19 +111,13 @@ function showHide(num)
    if(objToggleItem.style.display == '' || objToggleItem.style.display == 'none')
      {
          objToggleItem.style.display = 'block';
-         if(gfxicons)
-            objPlusMinusImage.src = imagePath + "tivo_show.gif";
-         else
-            objPlusMinusImage.src = imagePath + "minus.gif";
+         objPlusMinusImage.src = imagePath + "minus.gif";
      }
 
      else
      {
          objToggleItem.style.display = 'none';
-         if(gfxicons)
-            objPlusMinusImage.src = imagePath + "tivo_hide.gif";
-         else
-            objPlusMinusImage.src = imagePath + "plus.gif";
+         objPlusMinusImage.src = imagePath + "plus.gif";
      }
    return true;
 }
