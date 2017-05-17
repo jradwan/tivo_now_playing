@@ -16,3 +16,4 @@ h4 { color: #225588; font-family: Verdana; font-size: 18px; }
 .pgid{ color: #336699; float: left; font-family: Verdana; font-size: 14px; padding-right: 10px; }
 .totaltime, .totalitems, .totalsize { color: #336699; font-family: Verdana; font-size: 14px; font-weight: bold; padding-left: 10px; padding-right: 10px; margin-bottom: 3px; } 
 div.totalblock{ border: 1px #336699 dotted; clear: both; color: #336699; font-family: Verdana; margin: 0px 0px 8px 0px; padding: 5px; border-radius: 8px; }
+table.sortable thead { background-color:#336699; color:#E6F2FF; font-weight: bold; cursor: default; } 

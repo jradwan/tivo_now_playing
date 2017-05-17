@@ -31,6 +31,11 @@
  *  removed old gfxicons option
  *  indent program details block (css)
  *  clean up totals block (css)
+ *
+ * 20170516 jradwan (windracer)
+ * add sortable table with episode/series info
+ * more graphical updates, css tweaks
+ *
 */
 
 ini_set("max_execution_time", "180");
@@ -119,10 +124,11 @@ $allheader .= "<title>" . "All TiVos - Now Playing" . "</title><link href=" . $m
 $allheader .= "<body onload=\"init()\">\n";
 
 // link back to Summary page at top 
-$allheader .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary page </a></div>\n";
+$allheader .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 
 // link to expand/collapse all entries on the page
-$allheader .= "<img src=\"" .$images. "plus.gif\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" border=\"0\" align=\"left\"><div class=\"dura\">&thinsp; expand/collapse all</div>\n";
+$allheader .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
+$allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
 
 $allheader .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 
@@ -130,8 +136,29 @@ $allheader .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F 
 $allheader .= "<script id=\"imagepath\"> \"" . $images . "\" </script>\n";
 $allheader .= "<script src=" . $mytjs . " > </script>\n";
 
-
 $allcontent = "";
+
+// header for sortable episodes page
+$sort_header .= "<!DOCTYPE html>\n";
+$sort_header .= "<html><head>\n";
+$sort_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
+$sort_header .= "<LINK REL=\"shortcut icon\" HREF=\"" . $images . "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
+$sort_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n";
+$sort_header .= "<sh>\n<title> All TiVos - Sortable Episode List </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
+$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
+$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "alldvrs.htm\" >&larr;&thinsp; back to All TiVos - Now Playing </a></div>\n";
+$sort_header .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
+
+// header for sortable table of episodes, series ids, etc.
+$sort_table .= "<br>\n<h4>\n<table id=\"Summary\" class=\"sortable\" border=\"1\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n";
+$sort_table .= " <tr>
+        <th class=\"sorrtable\"> TiVo </th>
+        <th class=\"sorttable\"> Series Name </th>
+        <th class=\"sorttable_alpha\"> Episode </th>
+        <th class=\"sorttable\"> Program ID </th>
+        <th class=\"sorttable\"> Series ID </th>
+        <th class=\"sorttable_numeric\"> Record Date </th>
+ </tr>\n";
 
 // loop for each TiVo defined in the array defined in tivo_settings.php
 foreach($tivos as $tivo) {
@@ -190,10 +217,10 @@ foreach($tivos as $tivo) {
 	$header .= "<body onload=\"init()\">\n";
 
 	// add link back to Summary page at top 
-	$header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary page </a></div>\n";
+	$header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 
 	// link to expand/collapse all entries on the page
-        $header .= "<img src=\"" .$images. "plus.gif\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" border=\"0\" align=\"left\"><div class=\"dura\">&thinsp; expand/collapse all</div>\n";
+	$header .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
 
 	if (file_exists("$image_path". "tivo_" . $tivo['model'] . ".png")){
 		$header .= "<h1> <img src=\"" .$images. "tivo_" . $tivo['model'] . ".png\"><br>" . $tivo['nowplaying'] . " </h1>\n";
@@ -209,112 +236,126 @@ foreach($tivos as $tivo) {
 
 	$sum_table .= "<tr> "; // start of new row in the table for summary page data
 
-	if($tivoarray == null) $content .= "<center><font size=12 face=verdana color=\"red\">This TiVo is currently unavailable</font></center>"; else
+	if($tivoarray == null) 
+		$content .= "<center><font size=12 face=verdana color=\"red\">This TiVo is currently unavailable</font></center>";
+	else {
 		for ($i = 1;$i < count($tivoarray);$i++) {
-		$ci = $tivoarray[$i]['customicon'];
-		$customicon = explode(":", $ci);
-		$sc = explode("-", $tivoarray[$i]['sourcechannel']);
+			$ci = $tivoarray[$i]['customicon'];
+			$customicon = explode(":", $ci);
+			$sc = explode("-", $tivoarray[$i]['sourcechannel']);
 
-		$tivoarray[$i]['content'] = str_replace("amp;", "", $tivoarray[$i]['content']);
-		$tivoarray[$i]['title'] = str_replace("amp;", "", $tivoarray[$i]['title']);
-		$tivoarray[$i]['episodetitle'] = str_replace("amp;", "", $tivoarray[$i]['episodetitle']);
-		if ($tivoarray[$i]['description'] != "") {
-			$tivoarray[$i]['description'] = str_replace("amp;", "", $tivoarray[$i]['description']);
-			$tivoarray[$i]['description'] = str_replace("Copyright Tribune Media Services, Inc.", "", $tivoarray[$i]['description']);
-			$tivoarray[$i]['description'] = str_replace("Copyright Rovi, Inc.", "", $tivoarray[$i]['description']);
-		}
+			$tivoarray[$i]['content'] = str_replace("amp;", "", $tivoarray[$i]['content']);
+			$tivoarray[$i]['title'] = str_replace("amp;", "", $tivoarray[$i]['title']);
+			$tivoarray[$i]['episodetitle'] = str_replace("amp;", "", $tivoarray[$i]['episodetitle']);
+			if ($tivoarray[$i]['description'] != "") {
+				$tivoarray[$i]['description'] = str_replace("amp;", "", $tivoarray[$i]['description']);
+				$tivoarray[$i]['description'] = str_replace("Copyright Tribune Media Services, Inc.", "", $tivoarray[$i]['description']);
+				$tivoarray[$i]['description'] = str_replace("Copyright Rovi, Inc.", "", $tivoarray[$i]['description']);
+			}
 
-		$tivoarray[$i]['content'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['content']);
-		$tivoarray[$i]['title'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['title']);
-		$tivoarray[$i]['episodetitle'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['episodetitle']);
-		$tivoarray[$i]['description'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['description']);
+			$tivoarray[$i]['content'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['content']);
+			$tivoarray[$i]['title'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['title']);
+			$tivoarray[$i]['episodetitle'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['episodetitle']);
+			$tivoarray[$i]['description'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['description']);
 
-		// collect the programid, series and episode information
-		$tivoarray[$i]['programid'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['programid']);
-		$tivoarray[$i]['seriesid'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['seriesid']);
-		$tivoarray[$i]['episodenumber'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['episodenumber']);
-		$tivoarray[$i]['tvrating'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['tvrating']);
-		$tivoarray[$i]['mpaarating'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['mpaarating']);
+			// collect the programid, series and episode information
+			$tivoarray[$i]['programid'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['programid']);
+			$tivoarray[$i]['seriesid'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['seriesid']);
+			$tivoarray[$i]['episodenumber'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['episodenumber']);
+			$tivoarray[$i]['tvrating'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['tvrating']);
+			$tivoarray[$i]['mpaarating'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['mpaarating']);
 
-		$content .= "<div class=\"programitem\">\n";
-		$content .= "<img src=\"" .$images. "plus.gif\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\">\n";
+			$content .= "<div class=\"programitem\">\n";
+			$content .= "<img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\">\n";
 
-		if ($customicon[3] != "") {
-			$content .= "<img src=\"" .$images. "" . $customicon[3] . ".png\" width=\"16\" height=\"16\">\n";
-		}
-		else {
-			$content .= "<img src=\"" .$images. "" . "regular-recording.png\" width=\"16\" height=\"16\">\n";
+			if ($customicon[3] != "") {
+				$content .= "<img src=\"" .$images. "" . $customicon[3] . ".png\" width=\"16\" height=\"16\">\n";
+			}
+			else {
+				$content .= "<img src=\"" .$images. "" . "regular-recording.png\" width=\"16\" height=\"16\">\n";
+			}
 
-		}
+			if ($imdblinks == 1) {
+				$imdb = str_replace(" ", "%20", $tivoarray[$i]['title']);
+				$content .= "<a href=\"http://www.imdb.com/find?q=" . $imdb . ";tt=on;nm=on;mx=20\" target=\"_blank\"><img src=\"" .$images. "imdb.png\" border=\"0\" width=\"16\" height=\"16\"></a>\n";
+			}
 
-		if ($imdblinks == 1) {
-			$imdb = str_replace(" ", "%20", $tivoarray[$i]['title']);
-			$content .= "<a href=\"http://www.imdb.com/find?q=" . $imdb . ";tt=on;nm=on;mx=20\" target=\"_blank\"><img src=\"" .$images. "imdb.png\" border=\"0\" width=\"16\" height=\"16\"></a>\n";
-		}
+			if ($disablexmllinks == 0){
+				$content .= "<a href=" . $tivoarray[$i]['tivovideodetails'] . ">";
+			}
 
-		if ($disablexmllinks == 0){
-			$content .= "<a href=" . $tivoarray[$i]['tivovideodetails'] . ">";
-		}
+			$content .= "<span class=\"name\">" . $tivoarray[$i]['title'] . "</span>";
 
-		$content .= "<span class=\"name\">" . $tivoarray[$i]['title'] . "</span>";
+			if ($tivoarray[$i]['episodetitle'] != "")
+				$content .= " - <span class=\"eptitle\">" . $tivoarray[$i]['episodetitle'] . "</span>\n";
+			if ($disablexmllinks == 0)
+				$content .= "</a>\n";
 
-		if ($tivoarray[$i]['episodetitle'] != "")
-			$content .= " - <span class=\"eptitle\">" . $tivoarray[$i]['episodetitle'] . "</span>\n";
-		if ($disablexmllinks == 0)
-			$content .= "</a>\n";
+			$content .= "<div class=\"item\" id=\"myTbody" . $icnt++ . "\">\n";
+			if ($tivoarray[$i]['description'] != "") {
+				$content .= "<div class=\"desc\">" . $tivoarray[$i]['description'] . "</div>\n";
+			}
+			$content .= "<br>\n";
+			$content .= "<div class=\"date\">Channel: " . $tivoarray[$i]['sourcestation'] . " (" . $sc[0] . ")</div>\n";
+			$content .= "<div class=\"date\">Recorded: " . tivoDate("g:i a - F j, Y", $tivoarray[$i]['capturedate']) . "</div>\n";
+			$content .= "<div class=\"size\">Size: " . toMB($tivoarray[$i]['sourcesize']) . " MB</div>\n";
+			$content .= "<div class=\"dura\">Duration: " . mSecsToTime($tivoarray[$i]['duration']) . "</div>\n";
 
-		$content .= "<div class=\"item\" id=\"myTbody" . $icnt++ . "\">\n";
-		if ($tivoarray[$i]['description'] != "") {
-			$content .= "<div class=\"desc\">" . $tivoarray[$i]['description'] . "</div>\n";
-		}
-		$content .= "<br>\n";
-		$content .= "<div class=\"date\">Channel: " . $tivoarray[$i]['sourcestation'] . " (" . $sc[0] . ")</div>\n";
-		$content .= "<div class=\"date\">Recorded: " . tivoDate("g:i a - F j, Y", $tivoarray[$i]['capturedate']) . "</div>\n";
-		$content .= "<div class=\"size\">Size: " . toMB($tivoarray[$i]['sourcesize']) . " MB</div>\n";
-		$content .= "<div class=\"dura\">Duration: " . mSecsToTime($tivoarray[$i]['duration']) . "</div>\n";
+			// programid, series and episode information
+			$content .= "<div class=\"pgid\">ProgramId: " . $tivoarray[$i]['programid'] . "</div>\n";
+			$content .= "<div class=\"srid\">SeriesId: " . $tivoarray[$i]['seriesid'] . "</div>\n";
+			if($tivoarray[$i]['episodenumber'] > 0)	
+				$content .= "<div class=\"epnum\">EpisodeNumber: " . $tivoarray[$i]['episodenumber'] . "</div>\n";
 
-		// programid, series and episode information
-		$content .= "<div class=\"pgid\">ProgramId: " . $tivoarray[$i]['programid'] . "</div>\n";
-		$content .= "<div class=\"srid\">SeriesId: " . $tivoarray[$i]['seriesid'] . "</div>\n";
-		if($tivoarray[$i]['episodenumber'] > 0)	
-			$content .= "<div class=\"epnum\">EpisodeNumber: " . $tivoarray[$i]['episodenumber'] . "</div>\n";
+			if($tivoarray[$i]['tvrating'] > 0)
+				$content .= "<div class=\"epnum\">TvRating: " . $tivoarray[$i]['tvrating'] . "</div>\n";
 
-		if($tivoarray[$i]['tvrating'] > 0)
-			$content .= "<div class=\"epnum\">TvRating: " . $tivoarray[$i]['tvrating'] . "</div>\n";
+			if($tivoarray[$i]['mpaarating'] > 0)
+				$content .= "<div class=\"epnum\">MPAARating: " . $tivoarray[$i]['mpaarating'] . "</div>\n";
 
-		if($tivoarray[$i]['mpaarating'] > 0)
-			$content .= "<div class=\"epnum\">MPAARating: " . $tivoarray[$i]['mpaarating'] . "</div>\n";
+			$content .= "<br>\n";
 
-		$content .= "<br>\n";
-
-		if ($disabledownloadlinks == 0) {
-			$content .= "<a class=\"download\" href=" . $tivoarray[$i]['content'] . ">Download</a><br>\n";
+			if ($disabledownloadlinks == 0) {
+				$content .= "<a class=\"download\" href=" . $tivoarray[$i]['content'] . ">Download</a><br>\n";
+				$content .= "</div>\n";
+			}
 			$content .= "</div>\n";
-		}
-		$content .= "</div>\n";
-		$content .= "</div>\n";
-		$totallength += $tivoarray[$i]['duration'];
-		$totalsize += $tivoarray[$i]['sourcesize'];
+			$content .= "</div>\n";
+			$totallength += $tivoarray[$i]['duration'];
+			$totalsize += $tivoarray[$i]['sourcesize'];
 
-		// compute suggestions
-		if($customicon[3] == "suggestion-recording") {
-			$totalsuggestions += $tivoarray[$i]['sourcesize'];
-			$totalnumsuggestions++;
-		}
-
-		// requested in-progress recordings are listed first
-		if($recording_suggestion == true){
-			if($customicon[3] == "in-progress-recording"){
+			// compute suggestions
+			if($customicon[3] == "suggestion-recording") {
 				$totalsuggestions += $tivoarray[$i]['sourcesize'];
 				$totalnumsuggestions++;
 			}
-		} else {
-			if($customicon[3] != "in-progress-recording"){
-				// all in-progress recordings should now be suggestions
-				$recording_suggestion = true;
-			}
-		}
-	}
+
+			// requested in-progress recordings are listed first
+			if($recording_suggestion == true){
+				if($customicon[3] == "in-progress-recording"){
+					$totalsuggestions += $tivoarray[$i]['sourcesize'];
+					$totalnumsuggestions++;
+				}
+			} else {
+				if($customicon[3] != "in-progress-recording"){
+					// all in-progress recordings should now be suggestions
+					$recording_suggestion = true;
+				}
+			}	
+
+               		// add a row to the sortable table
+			$sort_table .= "<tr>";  
+			$sort_table .= "<td>" . $tivo ['name'] ."</td>"; 
+			$sort_table .= "<td>" . $tivoarray [$i] ['title'] ."</td>"; 
+			$sort_table .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
+			$sort_table .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
+			$sort_table .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
+			$sort_table .= "<td sorttable_customkey=\"" . tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) .
+				"\">" .  tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) . "</td>";
+			$sort_table .= "</tr>\n";
+
+		} // loop through tivoarray
+	} // if tivoarray is not null
 
 	if($tivoarray == null){ // avoid null values when TiVo is off-line
 		$totalitems = 0; $freespace = 0; $percent_free = 0.0; $totalsize = 0; $totallength=0; $totalsuggestions = 0;
@@ -366,7 +407,7 @@ foreach($tivos as $tivo) {
 	$footer .= "</div>\n";
 
 	// add a link to the summary page
-	$footer .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary page </a></div>\n";
+	$footer .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 
 	$footer .= "</body></html>";
 	$fp1 = @fopen($nowPlaying, "w");
@@ -405,7 +446,7 @@ foreach($tivos as $tivo) {
 			$sug_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 			$sug_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
 			$sug_header .= "</head><body><sh>\n<title> Suggestions Summary </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
-			$sug_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" > &larr;&thinsp; back to Summary page </a></div>";
+			$sug_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" > &larr;&thinsp; back to Summary </a></div>";
 			$sug_header .= "<h2> Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 			$sug_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>";
 			// create the table and add data from the log file
@@ -415,7 +456,7 @@ foreach($tivos as $tivo) {
 			$sug_table .= file_get_contents($sug_log_file);
 			$sug_table .= "</table></h4>\n";
 
-			$sug_footer .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" > &larr;&thinsp; back to Summary page </a></div>";
+			$sug_footer .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" > &larr;&thinsp; back to Summary </a></div>";
 			$sug_footer .= "</body></html>";
 
 			$fpt1 = @fopen($sug_html_file, 'w');
@@ -427,17 +468,18 @@ foreach($tivos as $tivo) {
 	} // end $nplarchives == 1 check
 
 	// for summary table
-	if($tivoarray == null){	// if TiVo is off line create a placeholder
+	if($tivoarray == null) { // if TiVo is off line create a placeholder
 		$sum_table .= "<td bgcolor = \"silver\" ><a href=" . $nowPlaying . " >" . $tivo['shorttitle'] . "</a> </td>";
 		$sum_table .= "<td bgcolor = \"silver\">" . $tivo['size_gb'] . " GB</td> ";
 		$sum_table .= "<td bgcolor = \"silver\">----</td> ";
 		$sum_table .= "<td bgcolor = \"silver\">----</td> ";
 		$sum_table .= "<td bgcolor = \"silver\">----</td>";
-		$sum_table .= "<td bgcolor = \"silver\"> <a href=" . $sug_html_file . ">----</a></td>";
+		if($nplarchives == 1) 
+			$sum_table .= "<td bgcolor = \"silver\"> <a href=" . $sug_html_file . ">----</a></td>";
 
-	}else{ // new add entry to the summary table
+	}
+	else { // new add entry to the summary table
 		$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\">" . $tivo['shorttitle'] . "</a> </td>";
-
 		$sum_table .= "<td>" . $tivo['size_gb'] . " GB</td> ";
 		$sum_table .= "<td>" . toGB($totalsize) . " GB</td> ";
 		$sum_table .= "<td>" . mBtoGB($freespace) . " GB</td> ";
@@ -525,13 +567,25 @@ $allfooter .= "<div class=\"totalsize\">Available Space (including Suggestions):
 $allfooter .= "</div>\n";
 
 // add a link to the summary page
-$allfooter .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary page </a></div>";
+$allfooter .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
+$allfooter .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
 $allfooter .= "</body></html>";
 // end of footer for all TiVos
+
+// sort table footer
+$sort_table .= "</table>\n</h4>\n";
+$sort_footer .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
+$sort_footer .= "<div class=\"dura\"><a href=\"" . $myurl . "alldvrs.htm\" >&larr;&thinsp; back to All TiVos - Now Playing </a></div>\n";
+$sort_footer .= "</body></html>";
 
 // all TiVos
 $fp1 = @fopen($nowPlaying , "w");
 fwrite($fp1, $allheader . $allcontent . $allfooter );
 fclose($fp1);
+
+// sortable list
+$fp1 = @fopen ( "sort.htm", "w" );
+fwrite ( $fp1, $sort_header . $sort_table . $sort_footer );
+fclose ( $fp1 );
 
 ?>

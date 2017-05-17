@@ -111,13 +111,13 @@ function showHide(num)
    if(objToggleItem.style.display == '' || objToggleItem.style.display == 'none')
      {
          objToggleItem.style.display = 'block';
-         objPlusMinusImage.src = imagePath + "minus.gif";
+         objPlusMinusImage.src = imagePath + "checkbox-selected.png";
      }
 
      else
      {
          objToggleItem.style.display = 'none';
-         objPlusMinusImage.src = imagePath + "plus.gif";
+         objPlusMinusImage.src = imagePath + "checkbox.png";
      }
    return true;
 }
