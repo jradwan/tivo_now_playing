@@ -17,6 +17,8 @@ Now Playing page:
 
 ![npl-details](https://github.com/jradwan/tivo_now_playing/blob/master/images/screenshot-npl.png)
 
+See it live [here](https://www.windracer.net/tivo/summary.htm).
+
 # Setup
 Edit bin/tivo_settings.php and make the necessary changes for your environment.
 * wgetpath: path to wget
