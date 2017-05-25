@@ -35,6 +35,12 @@
  * 20170516 jradwan (windracer)
  * add sortable table with episode/series info
  * more graphical updates, css tweaks
+ * 
+ * 20170523 VicW TiVoHomeUser (homeuser)
+ *  Added Sortable tables grouped by seriesid by putting everything 
+ *  in an indexed array $folders adding additional rows every time the same seriesid
+ *  is encountered.
+ *  
  *
 */
 
@@ -129,6 +135,7 @@ $allheader .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;
 // link to expand/collapse all entries on the page
 $allheader .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
 $allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
+$allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list2 </a></div>\n";
 
 $allheader .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 
@@ -147,6 +154,7 @@ $sort_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"><
 $sort_header .= "<sh>\n<title> All TiVos - Sortable Episode List </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "alldvrs.htm\" >&larr;&thinsp; back to All TiVos - Now Playing </a></div>\n";
+$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list2 </a></div>\n";
 $sort_header .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 
 // header for sortable table of episodes, series ids, etc.
@@ -206,7 +214,7 @@ foreach($tivos as $tivo) {
 
 	if($tivoxml->getErr() == false)
 		if ($dorss == 1) { 
-		include($binpath . "rss.php");// rss code moved to external file rss.php
+		include($binpath . "rss.php");	// rss code moved to external file rss.php
 	} 
 
 	$header .= "<!DOCTYPE html\n>"; 
@@ -354,6 +362,29 @@ foreach($tivos as $tivo) {
 				"\">" .  tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) . "</td>";
 			$sort_table .= "</tr>\n";
 
+// ***** New 20170523 VicW
+			$folders[$tivoarray [$i] ['seriesid']] .= "<tr>";										// add the TiVo's name for the first field in the sort table
+			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";		// Add shows title to sort table
+			
+			if ($customicon[3] != "") {
+				$folders[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
+				 $customicon[3] . ".png\" width=\"16\" height=\"16\"></td>\n";
+			}
+			else {
+				$folders[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
+				 "regular-recording.png\" width=\"16\" height=\"16\"></td>\n";
+			}
+
+			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";	// Add shows title to sort table
+			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
+			$folders[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
+					tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .						// Record date index on sortable numeric value
+					tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";					// Record date viewable format
+			// Note: ProgrameID and Series are for testing may be removed one or both in the future
+			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
+			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";				
+// *****	
+		
 		} // loop through tivoarray
 	} // if tivoarray is not null
 
@@ -569,6 +600,7 @@ $allfooter .= "</div>\n";
 // add a link to the summary page
 $allfooter .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 $allfooter .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
+$allfooter .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list2 </a></div>\n";
 $allfooter .= "</body></html>";
 // end of footer for all TiVos
 
@@ -587,5 +619,30 @@ fclose($fp1);
 $fp1 = @fopen ( "sort.htm", "w" );
 fwrite ( $fp1, $sort_header . $sort_table . $sort_footer );
 fclose ( $fp1 );
+
+// ***** New 20170523 VicW
+$fp1 = @fopen ( "folders.htm", "w" );
+fwrite($fp1, $sort_header);	// Reuused sort header from b4
+foreach($folders as $x => $x_value) {	// Procress the entire array
+	// header for each series put in loop to give each table a unique ID from the seriesid
+	fwrite($fp1, "<h4>\n<br><table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
+	fwrite($fp1, "	<tr>
+					<th> TiVo </th>
+					<th class=\"sorttable\"> Status </th>
+					<th class=\"sorttable\"> Series Name </th>
+					<th class=\"sorttable\"> Episode </th>
+					<th class=\"sorttable_numeric\"> Record Date </th>
+					<th class=\"sorttable\"> Program ID </th>
+					<th class=\"sorttable\"> Series ID </th>
+					</tr>\n");
+
+	fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
+	fwrite($fp1, "</table>\n</h4>\n");
+}
+// footer
+fwrite($fp1, "<a href=\"" . $myurl . "summary.htm\" >&larr; back to Summary page </a>");
+fwrite($fp1, "</body></html>");
+fclose ( $fp1 );
+// *****
 
 ?>
