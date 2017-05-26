@@ -135,7 +135,7 @@ $allheader .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;
 // link to expand/collapse all entries on the page
 $allheader .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
 $allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
-$allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list2 </a></div>\n";
+$allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
 
 $allheader .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 
@@ -154,7 +154,8 @@ $sort_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"><
 $sort_header .= "<sh>\n<title> All TiVos - Sortable Episode List </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "alldvrs.htm\" >&larr;&thinsp; back to All TiVos - Now Playing </a></div>\n";
-$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list2 </a></div>\n";
+$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
+$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
 $sort_header .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 
 // header for sortable table of episodes, series ids, etc.
@@ -367,12 +368,12 @@ foreach($tivos as $tivo) {
 			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";		// Add shows title to sort table
 			
 			if ($customicon[3] != "") {
-				$folders[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
-				 $customicon[3] . ".png\" width=\"16\" height=\"16\"></td>\n";
+				$folders[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
+				 $customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 			else {
-				$folders[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
-				 "regular-recording.png\" width=\"16\" height=\"16\"></td>\n";
+				$folders[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
+				 "regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 
 			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";	// Add shows title to sort table
@@ -600,7 +601,7 @@ $allfooter .= "</div>\n";
 // add a link to the summary page
 $allfooter .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 $allfooter .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
-$allfooter .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list2 </a></div>\n";
+$allfooter .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
 $allfooter .= "</body></html>";
 // end of footer for all TiVos
 
@@ -608,6 +609,8 @@ $allfooter .= "</body></html>";
 $sort_table .= "</table>\n</h4>\n";
 $sort_footer .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 $sort_footer .= "<div class=\"dura\"><a href=\"" . $myurl . "alldvrs.htm\" >&larr;&thinsp; back to All TiVos - Now Playing </a></div>\n";
+$sort_footer .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
+$sort_footer .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
 $sort_footer .= "</body></html>";
 
 // all TiVos
@@ -640,7 +643,7 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 	fwrite($fp1, "</table>\n</h4>\n");
 }
 // footer
-fwrite($fp1, "<a href=\"" . $myurl . "summary.htm\" >&larr; back to Summary page </a>");
+fwrite($fp1, $sort_footer );
 fwrite($fp1, "</body></html>");
 fclose ( $fp1 );
 // *****
