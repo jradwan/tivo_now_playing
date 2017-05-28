@@ -41,6 +41,10 @@
  *  in an indexed array $folders adding additional rows every time the same seriesid
  *  is encountered.
  *  
+ *  20170527 VicW (TiVoHomeUser)
+ *   Moved write for _track_drive_size.log inside the size check block.
+ *   Now the log file is only writen to when the computed storage size has changed. 
+ *  
  *
 */
 
@@ -114,7 +118,12 @@ $sum_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></
 
 // start of sortable summary table
 $sum_table .= "<h4>\n<br><table id=\"Summary\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n";
-$sum_table .= " <tr> <th> TiVo </th> <th class=\"sorttable_numeric\"> Drive Size </th> <th class=\"sorttable_numeric\"> Used Space </th> <th class=\"sorttable_numeric\"> Available Space </th> <th class=\"sorttable_numeric\"> Percent Free </th> ";
+$sum_table .= " <tr> 
+		<th> TiVo </th> 
+		<th class=\"sorttable_numeric\"> Drive Size </th> 
+		<th class=\"sorttable_numeric\"> Used Space </th> 
+		<th class=\"sorttable_numeric\"> Available Space </th> 
+		<th class=\"sorttable_numeric\"> Percent Free </th> ";
 if($nplarchives == 1) {
 	$sum_table .= "<th> Suggestions </th>";
 }
@@ -414,6 +423,16 @@ foreach($tivos as $tivo) {
 			fwrite($fpt,"\t\$auto_size_gb = \"" . $tivo['size_gb'] . "\";\t// Set to -1 to disable auto size adjustment\n" );
 			fwrite($fpt, "?>\n");
 			fclose($fpt);
+			
+			// TODO remove debug logging
+			// debug tracking size totals
+			// log file to track drive size and computed drive size history
+			$fpt = @fopen("log". delim . $tivo['name'] . "_track_drive_size.log", 'a');
+			fwrite($fpt, "// " .date("F j, Y, g:i a") . "\t" . $tivo['size_gb'] . " GB\t" . toGB($totalsize) . " GB\n");
+			fwrite($fpt,"\$auto_size_gb = \"" . $tivo['size_gb'] . "\";\n" );
+			fclose($fpt);
+			// end of debug logging code
+					
 			// TODO find some way to update the settings file.
 		}
 		$totalitems = $tivoarray[0]['totalitems'];
@@ -445,14 +464,6 @@ foreach($tivos as $tivo) {
 	fwrite($fp1, $header . $content . $footer);
 	fclose($fp1);
 
-	// TODO remove debug logging
-	// debug tracking size totals
-	// log file to track drive size and computed drive size history
-	$fpt = @fopen("log". delim . $tivo['name'] . "_track_drive_size.log", 'a');
-	fwrite($fpt, "// " .date("F j, Y, g:i a") . "\t" . $tivo['size_gb'] . " GB\t" . toGB($totalsize) . " GB\n");
-	fwrite($fpt,"\$auto_size_gb = \"" . $tivo['size_gb'] . "\";\n" );
-	fclose($fpt);
-	// end of debug logging code
 
 	if($nplarchives == 1) {	
 	 	// archive loop Update once in the first 15 minutes of the hour
