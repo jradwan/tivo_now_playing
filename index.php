@@ -44,9 +44,12 @@
  *  20170527 VicW (TiVoHomeUser)
  *   Moved write for _track_drive_size.log inside the size check block.
  *   Now the log file is only writen to when the computed storage size has changed. 
- *  
  *
- *eclipse attempt 5
+ *  20170528 VicW
+ *   Link to folders from All Suggesions
+ *   added tivo ahortname to message in Suggestions link
+ *
+ *
  *
 */
 
@@ -538,7 +541,7 @@ foreach($tivos as $tivo) {
 			if($totalnumsuggestions < 10) $sum_table .= "<td bgcolor = \"red\">";
 			else if($totalnumsuggestions < 20) $sum_table .= "<td bgcolor = \"yellow\">";
 			else $sum_table .= "<td>";
-			$sum_table .="<a href=" . $sug_html_file . " title=\"Now Playing History\">" .$totalnumsuggestions . "</a></td>";
+			$sum_table .="<a href=" . $sug_html_file . " title=\"". $tivo['shorttitle'] ." Now Playing History\">" .$totalnumsuggestions . "</a></td>";
 		}
 	}
 	// end of table
@@ -581,11 +584,20 @@ else if($tivo['warning'] > $allpercent_free) $sum_table .= "<td bgcolor = \"yell
 else  $sum_table .= "<td>";
 $sum_table .= $allpercent_free . "%</td>";
 
+// if($nplarchives ==1) {
+// 	if($totalnumsuggestions < 10) $sum_table .= "<td bgcolor = \"red\">";
+// 	else if($totalnumsuggestions < 20) $sum_table .= "<td bgcolor = \"yellow\">";
+// 	else $sum_table .= "<td>";
+// 	$sum_table .="<a href=" . $sug_html_file . " title=\"Now Playing History\">" .$totalnumsuggestions . "</a></td>";
+// }
+
+
 if($nplarchives == 1) {
 	if($alltotalnumsuggestions < 10) $sum_table .= "<td bgcolor = \"red\">";
 	else if($alltotalnumsuggestions < 20) $sum_table .= "<td bgcolor = \"yellow\">";
 	else $sum_table .= "<td>";
-	$sum_table .= $alltotalnumsuggestions . "</td>";
+	//$sum_table .= $alltotalnumsuggestions . "</td>";
+	$sum_table .="<a href=" . "folders.htm" . " title=\"Sortable episode list\">" . $alltotalnumsuggestions . "</a></td>";
 }
 $sum_table .= "</tr>\n";
 // end of add all totals
