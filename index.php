@@ -54,10 +54,13 @@
  *   Added $LASTUPDATE for reference in summary header
  *   summary TiVo name now has (Grouped) link to Grouped Now Playing
  *   
+ * 20170602
+ *   Added link to TiVoHomeUser's branch at github to the bottom of the summary page.
+ *   06/-3  modified link's verbage
  *
  *
 */
-$LASTUPDATE = "20170531";
+$LASTUPDATE = "20170603";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -307,7 +310,8 @@ foreach($tivos as $tivo) {
 			$tivoarray[$i]['tvrating'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['tvrating']);
 			$tivoarray[$i]['mpaarating'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['mpaarating']);
 
-			$content .= "<div class=\"programitem\">\n";
+			// $content .= "<div class=\"programitem\">\n";
+			$content.="<div>\n"; // div.programitem no longer in css file 
 			$content .= "<img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\">\n";
 
 			if ($customicon[3] != "") {
@@ -581,7 +585,7 @@ foreach($tivos as $tivo) {
 
 	// for summary table
 	if($tivoarray == null) { // if TiVo is off line create a placeholder
-		$sum_table .= "<td bgcolor = \"silver\" ><a href=" . $nowPlaying . " >" . $tivo['shorttitle'] . "</a> </td>";
+		//$sum_table .= "<td bgcolor = \"silver\" ><a href=" . $nowPlaying . " >" . $tivo['shorttitle'] . "</a> </td>";
 		// xxxxxxx New 20170531 
 		$sum_table .= "<td bgcolor = \"silver\" ><a href=" . $nowPlaying . " >" . $tivo['shorttitle'] . "</a> ";
 		$sum_table .= "<a href=" . $nowPlayingGroups . " + >" . $tivo['shorttitle'] . "+</a> </td>";
@@ -596,10 +600,11 @@ foreach($tivos as $tivo) {
 	}
 	else { // new add entry to the summary table
 // xxxxxxx New 20170531 
+		//  style=\"text-align:right\"
 		//$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\">" . $tivo['shorttitle'] . "</a> </td>";
-		$sum_table .= "<td><a href=" . $nowPlaying . " title=\"".$tivo['shorttitle']."'s Now Playing\">" . $tivo['shorttitle'] . "</a> ";
+		$sum_table .= "<td> <a href=" . $nowPlaying . " title=\"".$tivo['shorttitle']."'s Now Playing\">" . $tivo['shorttitle'] . "</a> ";
 		$sum_table .= "<a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "(Grouped)" . "</a> </td>";
-// xxxxxxx
+// xxxxxxx td style="text-align:right"
 		$sum_table .= "<td>" . $tivo['size_gb'] . " GB</td> ";
 		$sum_table .= "<td>" . toGB($totalsize) . " GB</td> ";
 		$sum_table .= "<td>" . mBtoGB($freespace) . " GB</td> ";
@@ -649,7 +654,7 @@ $sum_table .= "<tr> "; // start of new row in the table for summary page data
 
 // ******* New 20170531
 //$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\" >" . "ALL" . "</a> </td>";
-$sum_table .= "<td><a href=" . $nowPlaying . " title=\"'s Now Playing\">" .  "ALL" . "</a> ";
+$sum_table .= "<td style=\"text-align:justify\"><a href=" . $nowPlaying . " title=\"'s Now Playing\">" .  "ALL" . "</a> ";
 $sum_table .= "<a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "(Grouped)" . "</a> </td>";
 
 // *******
@@ -684,6 +689,16 @@ $sum_table .= "</tr>\n";
 
 // save totals and summary
 $sum_table  .= "</table>\n</h4>\n";
+
+//xxxxxxxx 20170602 temporary Link to git hub for vicw.us
+$sum_footer .= "last code update " .$LASTUPDATE ."\n";
+$sum_footer .= "<div class=\"dura\">
+				  <a href=\"https://github.com/TiVoHomeUser/tivo_now_playing\">
+			        Source for TiVoHomeUser's branch (work in progress) can be found here on GitHub
+		          </a>
+		        </div>\n";
+//xxxxxxxx
+
 $sum_footer .= "</body></html>";
 $fp1 = @fopen($summaryhtm , "w");
 fwrite($fp1, $sum_header . $sum_table . $sum_footer );
