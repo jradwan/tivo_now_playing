@@ -58,9 +58,12 @@
  *   Added link to TiVoHomeUser's branch at github to the bottom of the summary page.
  *   06/-3  modified link's verbage
  *
+ * 20170606
+ *   Swapped Groups and TiVo name in summary header
+ *   
  *
 */
-$LASTUPDATE = "20170603";
+$LASTUPDATE = "20170606";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -602,8 +605,10 @@ foreach($tivos as $tivo) {
 // xxxxxxx New 20170531 
 		//  style=\"text-align:right\"
 		//$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\">" . $tivo['shorttitle'] . "</a> </td>";
-		$sum_table .= "<td> <a href=" . $nowPlaying . " title=\"".$tivo['shorttitle']."'s Now Playing\">" . $tivo['shorttitle'] . "</a> ";
-		$sum_table .= "<a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "(Grouped)" . "</a> </td>";
+		$sum_table .= "<td> ";
+		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "(Grouped)" . "</a>";
+		$sum_table .= " <a href=" . $nowPlaying . " title=\"".$tivo['shorttitle']."'s Now Playing\">" . $tivo['shorttitle'] . "</a> ";
+		$sum_table .= "</td>";
 // xxxxxxx td style="text-align:right"
 		$sum_table .= "<td>" . $tivo['size_gb'] . " GB</td> ";
 		$sum_table .= "<td>" . toGB($totalsize) . " GB</td> ";
@@ -654,8 +659,10 @@ $sum_table .= "<tr> "; // start of new row in the table for summary page data
 
 // ******* New 20170531
 //$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\" >" . "ALL" . "</a> </td>";
-$sum_table .= "<td style=\"text-align:justify\"><a href=" . $nowPlaying . " title=\"'s Now Playing\">" .  "ALL" . "</a> ";
-$sum_table .= "<a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "(Grouped)" . "</a> </td>";
+$sum_table .= "<td style=\"text-align:justify\">";
+$sum_table .= " <a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "(Grouped)" . "</a>";
+$sum_table .= " <a href=" . $nowPlaying . " title=\"'s Now Playing\">" .  "ALL" . "</a> ";
+$sum_table .= "</td>";
 
 // *******
 
