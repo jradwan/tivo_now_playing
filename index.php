@@ -49,21 +49,26 @@
  *   Link to folders from All Suggesions
  *   added tivo ahortname to message in Suggestions link
  *
- * 20170531
+ * 20170531 VicW
  *   Sortable tables grouped by seriesid for each DVR
  *   Added $LASTUPDATE for reference in summary header
  *   summary TiVo name now has (Grouped) link to Grouped Now Playing
  *   
- * 20170602
+ * 20170602 VicW
  *   Added link to TiVoHomeUser's branch at github to the bottom of the summary page.
  *   06/-3  modified link's verbage
  *
- * 20170606
+ * 20170606 VicW
  *   Swapped Groups and TiVo name in summary header
- *   
+ *
+ * 20170608 VicW
+ *   Changed Grouped to Groups
+ * 
+ * 20170610 VicW
+ *   changed link to github in summart to include the master branch
  *
 */
-$LASTUPDATE = "20170606";
+$LASTUPDATE = "20170610";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -606,7 +611,7 @@ foreach($tivos as $tivo) {
 		//  style=\"text-align:right\"
 		//$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\">" . $tivo['shorttitle'] . "</a> </td>";
 		$sum_table .= "<td> ";
-		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "(Grouped)" . "</a>";
+		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "(Groups)" . "</a>";
 		$sum_table .= " <a href=" . $nowPlaying . " title=\"".$tivo['shorttitle']."'s Now Playing\">" . $tivo['shorttitle'] . "</a> ";
 		$sum_table .= "</td>";
 // xxxxxxx td style="text-align:right"
@@ -660,7 +665,7 @@ $sum_table .= "<tr> "; // start of new row in the table for summary page data
 // ******* New 20170531
 //$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\" >" . "ALL" . "</a> </td>";
 $sum_table .= "<td style=\"text-align:justify\">";
-$sum_table .= " <a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "(Grouped)" . "</a>";
+$sum_table .= " <a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "(Groups)" . "</a>";
 $sum_table .= " <a href=" . $nowPlaying . " title=\"'s Now Playing\">" .  "ALL" . "</a> ";
 $sum_table .= "</td>";
 
@@ -700,9 +705,11 @@ $sum_table  .= "</table>\n</h4>\n";
 //xxxxxxxx 20170602 temporary Link to git hub for vicw.us
 $sum_footer .= "last code update " .$LASTUPDATE ."\n";
 $sum_footer .= "<div class=\"dura\">
-				  <a href=\"https://github.com/TiVoHomeUser/tivo_now_playing\">
-			        Source for TiVoHomeUser's branch (work in progress) can be found here on GitHub
-		          </a>
+		Source can be found on GitHub:<br>
+		<a href=\"https://github.com/jradwan/tivo_now_playing\">
+		   - jradwan/tivo_now_playing Master branch</a><br>
+		<a href=\"https://github.com/TiVoHomeUser/tivo_now_playing\">
+		   - TiVoHomeUser's branch (work in progress)</a>					
 		        </div>\n";
 //xxxxxxxx
 
