@@ -41,8 +41,34 @@
  *  in an indexed array $folders adding additional rows every time the same seriesid
  *  is encountered.
  *  
+ *  20170527 VicW (TiVoHomeUser)
+ *   Moved write for _track_drive_size.log inside the size check block.
+ *   Now the log file is only writen to when the computed storage size has changed. 
+ *
+ *  20170528 VicW
+ *   Link to folders from All Suggesions
+ *   added tivo ahortname to message in Suggestions link
+ *
+ * 20170531 VicW
+ *   Sortable tables grouped by seriesid for each DVR
+ *   Added $LASTUPDATE for reference in summary header
+ *   summary TiVo name now has (Grouped) link to Grouped Now Playing
+ *   
+ * 20170602 VicW
+ *   Added link to TiVoHomeUser's branch at github to the bottom of the summary page.
+ *   06/-3  modified link's verbage
+ *
+ * 20170606 VicW
+ *   Swapped Groups and TiVo name in summary header
+ *
+ * 20170608 VicW
+ *   Changed Grouped to Groups
+ * 
+ * 20170610 VicW
+ *   changed link to github in summart to include the master branch
  *
 */
+$LASTUPDATE = "20170610";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -108,13 +134,23 @@ $sum_header .= "<!DOCTYPE html>\n";
 $sum_header .= "<html><head>\n";
 $sum_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 $sum_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
-$sum_header .= "<sh>\n<title>TiVo Disk Space - Summary</title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
+
+//$sum_header .= "<sh>\n<title>TiVo Disk Space - Summary</title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
+// ******* New 20170531
+$sum_header .= "<sh>\n<title>TiVo Disk Space - Summary ".$LASTUPDATE."</title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
+// *******
+
 $sum_header .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 $sum_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n";
 
 // start of sortable summary table
 $sum_table .= "<h4>\n<br><table id=\"Summary\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n";
-$sum_table .= " <tr> <th> TiVo </th> <th class=\"sorttable_numeric\"> Drive Size </th> <th class=\"sorttable_numeric\"> Used Space </th> <th class=\"sorttable_numeric\"> Available Space </th> <th class=\"sorttable_numeric\"> Percent Free </th> ";
+$sum_table .= " <tr> 
+		<th> TiVo </th> 
+		<th class=\"sorttable_numeric\"> Drive Size </th> 
+		<th class=\"sorttable_numeric\"> Used Space </th> 
+		<th class=\"sorttable_numeric\"> Available Space </th> 
+		<th class=\"sorttable_numeric\"> Percent Free </th> ";
 if($nplarchives == 1) {
 	$sum_table .= "<th> Suggestions </th>";
 }
@@ -171,7 +207,9 @@ $sort_table .= " <tr>
 
 // loop for each TiVo defined in the array defined in tivo_settings.php
 foreach($tivos as $tivo) {
-	unset($tivoarray, $totalsize, $totallength, $customicon, $sc, $totalitems, $freespace, $rssheader, $rsscontent, $rssfooter, $header, $content, $footer, $fp1, $fp2, $totalsuggestions, $totalnumsuggestions, $percent_free, $fpt, $auto_size_gb, $recording_suggestion, $sug_header, $sug_table, $sug_footer, $sug_html_file, $sug_log_file, $sug_html_file, $archNowPlaying, $nowPlaying);
+	unset($tivoarray, $totalsize, $totallength, $customicon, $sc, $totalitems, $freespace, $rssheader, $rsscontent, $rssfooter, $header,
+			 $content, $footer, $fp1, $fp2, $totalsuggestions, $totalnumsuggestions, $percent_free, $fpt, $auto_size_gb, $recording_suggestion,
+			 $sug_header, $sug_table, $sug_footer, $sug_html_file, $sug_log_file, $sug_html_file, $archNowPlaying, $nowPlaying, $groups);
 
 	// collect the data for the TiVo
 	$tivoxml = new Tivo_XML();
@@ -192,7 +230,14 @@ foreach($tivos as $tivo) {
 
 	// $nowPlaying Web page for the Now Playing List
 	$nowPlaying 	= $tivo['name'] . "_nowplaying.htm";
-
+// ******* New 20170531
+	// now Playing for groups html file 
+	$nowPlayingGroups 	= $tivo['name'] . "_group.htm";
+	$summaryhtm = "summary.htm";
+	$foldershtm = "folders.htm";	// All grouped by seriesid
+// *******
+	
+	
 	if($nplarchives == 1) {
 		// use suggestions to track free space vs unused space
 		// $sug_html_file Web page with table tracking number of suggestions and free space
@@ -274,7 +319,8 @@ foreach($tivos as $tivo) {
 			$tivoarray[$i]['tvrating'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['tvrating']);
 			$tivoarray[$i]['mpaarating'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['mpaarating']);
 
-			$content .= "<div class=\"programitem\">\n";
+			// $content .= "<div class=\"programitem\">\n";
+			$content.="<div>\n"; // div.programitem no longer in css file 
 			$content .= "<img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\">\n";
 
 			if ($customicon[3] != "") {
@@ -363,7 +409,31 @@ foreach($tivos as $tivo) {
 				"\">" .  tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) . "</td>";
 			$sort_table .= "</tr>\n";
 
-// ***** New 20170523 VicW
+// ******* New 20170531
+			$groups[$tivoarray [$i] ['seriesid']] .= "<tr>";										// add the TiVo's name for the first field in the sort table
+			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";		// Add shows title to sort table
+				
+			if ($customicon[3] != "") {
+				$groups[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
+						$customicon[3] . ".png\" width=\"16\" height=\"16\"></td>\n";
+			}
+			else {
+				$groups[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
+						"regular-recording.png\" width=\"16\" height=\"16\"></td>\n";
+			}
+			
+			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";	// Add shows title to sort table
+			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
+			$groups[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
+					tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .						// Record date index on sortable numeric value
+					tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";					// Record date viewable format
+			// Note: ProgrameID and Series are for testing may be removed one or both in the future
+			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
+			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
+				
+// *******
+
+// ***** New 20170523 VicW	Groups by seriesid for each DVR
 			$folders[$tivoarray [$i] ['seriesid']] .= "<tr>";										// add the TiVo's name for the first field in the sort table
 			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";		// Add shows title to sort table
 			
@@ -415,6 +485,16 @@ foreach($tivos as $tivo) {
 			fwrite($fpt,"\t\$auto_size_gb = \"" . $tivo['size_gb'] . "\";\t// Set to -1 to disable auto size adjustment\n" );
 			fwrite($fpt, "?>\n");
 			fclose($fpt);
+			
+			// TODO remove debug logging
+			// debug tracking size totals
+			// log file to track drive size and computed drive size history
+			$fpt = @fopen("log". delim . $tivo['name'] . "_track_drive_size.log", 'a');
+			fwrite($fpt, "// " .date("F j, Y, g:i a") . "\t" . $tivo['size_gb'] . " GB\t" . toGB($totalsize) . " GB\n");
+			fwrite($fpt,"\$auto_size_gb = \"" . $tivo['size_gb'] . "\";\n" );
+			fclose($fpt);
+			// end of debug logging code
+					
 			// TODO find some way to update the settings file.
 		}
 		$totalitems = $tivoarray[0]['totalitems'];
@@ -446,14 +526,27 @@ foreach($tivos as $tivo) {
 	fwrite($fp1, $header . $content . $footer);
 	fclose($fp1);
 
-	// TODO remove debug logging
-	// debug tracking size totals
-	// log file to track drive size and computed drive size history
-	$fpt = @fopen("log". delim . $tivo['name'] . "_track_drive_size.log", 'a');
-	fwrite($fpt, "// " .date("F j, Y, g:i a") . "\t" . $tivo['size_gb'] . " GB\t" . toGB($totalsize) . " GB\n");
-	fwrite($fpt,"\$auto_size_gb = \"" . $tivo['size_gb'] . "\";\n" );
-	fclose($fpt);
-	// end of debug logging code
+// ******* New 20170531
+	$fp1 = @fopen($nowPlayingGroups, "w");
+	fwrite($fp1, $header . "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n");
+	foreach($groups as $x => $x_value) {	// Procress the entire array
+		// header for each series put in loop to give each table a unique ID from the seriesid
+		fwrite($fp1, "<h4>\n<br><table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
+		fwrite($fp1, "	<tr>
+					<th> TiVo </th>
+					<th class=\"sorttable\"> Status </th>
+					<th class=\"sorttable\"> Series Name </th>
+					<th class=\"sorttable\"> Episode </th>
+					<th class=\"sorttable_numeric\"> Record Date </th>
+					<th class=\"sorttable\"> Program ID </th>
+					<th class=\"sorttable\"> Series ID </th>
+					</tr>\n");
+	
+		fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
+		fwrite($fp1, "</table>\n</h4>\n");
+	}	
+	fwrite($fp1, $fotter);
+// *******
 
 	if($nplarchives == 1) {	
 	 	// archive loop Update once in the first 15 minutes of the hour
@@ -501,7 +594,11 @@ foreach($tivos as $tivo) {
 
 	// for summary table
 	if($tivoarray == null) { // if TiVo is off line create a placeholder
-		$sum_table .= "<td bgcolor = \"silver\" ><a href=" . $nowPlaying . " >" . $tivo['shorttitle'] . "</a> </td>";
+		//$sum_table .= "<td bgcolor = \"silver\" ><a href=" . $nowPlaying . " >" . $tivo['shorttitle'] . "</a> </td>";
+		// xxxxxxx New 20170531 
+		$sum_table .= "<td bgcolor = \"silver\" ><a href=" . $nowPlaying . " >" . $tivo['shorttitle'] . "</a> ";
+		$sum_table .= "<a href=" . $nowPlayingGroups . " + >" . $tivo['shorttitle'] . "+</a> </td>";
+		// xxxxxxx
 		$sum_table .= "<td bgcolor = \"silver\">" . $tivo['size_gb'] . " GB</td> ";
 		$sum_table .= "<td bgcolor = \"silver\">----</td> ";
 		$sum_table .= "<td bgcolor = \"silver\">----</td> ";
@@ -511,7 +608,14 @@ foreach($tivos as $tivo) {
 
 	}
 	else { // new add entry to the summary table
-		$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\">" . $tivo['shorttitle'] . "</a> </td>";
+// xxxxxxx New 20170531 
+		//  style=\"text-align:right\"
+		//$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\">" . $tivo['shorttitle'] . "</a> </td>";
+		$sum_table .= "<td> ";
+		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "(Groups)" . "</a>";
+		$sum_table .= " <a href=" . $nowPlaying . " title=\"".$tivo['shorttitle']."'s Now Playing\">" . $tivo['shorttitle'] . "</a> ";
+		$sum_table .= "</td>";
+// xxxxxxx td style="text-align:right"
 		$sum_table .= "<td>" . $tivo['size_gb'] . " GB</td> ";
 		$sum_table .= "<td>" . toGB($totalsize) . " GB</td> ";
 		$sum_table .= "<td>" . mBtoGB($freespace) . " GB</td> ";
@@ -526,7 +630,7 @@ foreach($tivos as $tivo) {
 			if($totalnumsuggestions < 10) $sum_table .= "<td bgcolor = \"red\">";
 			else if($totalnumsuggestions < 20) $sum_table .= "<td bgcolor = \"yellow\">";
 			else $sum_table .= "<td>";
-			$sum_table .="<a href=" . $sug_html_file . " title=\"Now Playing History\">" .$totalnumsuggestions . "</a></td>";
+			$sum_table .="<a href=" . $sug_html_file . " title=\"". $tivo['shorttitle'] ." Now Playing History\">" .$totalnumsuggestions . "</a></td>";
 		}
 	}
 	// end of table
@@ -558,7 +662,16 @@ $allpercent_free .= floor((mBtoGB($allfreespace) /$all_size_gb)  * 1000)/10;;
 // add All Totals to a line on summary table
 $nowPlaying = "alldvrs.htm";
 $sum_table .= "<tr> "; // start of new row in the table for summary page data
-$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\" >" . "ALL" . "</a> </td>";
+
+// ******* New 20170531
+//$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\" >" . "ALL" . "</a> </td>";
+$sum_table .= "<td style=\"text-align:justify\">";
+$sum_table .= " <a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "(Groups)" . "</a>";
+$sum_table .= " <a href=" . $nowPlaying . " title=\"'s Now Playing\">" .  "ALL" . "</a> ";
+$sum_table .= "</td>";
+
+// *******
+
 $sum_table .= "<td>" . $all_size_gb . " GB</td> ";
 $sum_table .= "<td>" . toGB($alltotalsize) . " GB</td> ";
 $sum_table .= "<td>" . mBtoGB($allfreespace) . " GB</td> ";
@@ -569,19 +682,40 @@ else if($tivo['warning'] > $allpercent_free) $sum_table .= "<td bgcolor = \"yell
 else  $sum_table .= "<td>";
 $sum_table .= $allpercent_free . "%</td>";
 
+// if($nplarchives ==1) {
+// 	if($totalnumsuggestions < 10) $sum_table .= "<td bgcolor = \"red\">";
+// 	else if($totalnumsuggestions < 20) $sum_table .= "<td bgcolor = \"yellow\">";
+// 	else $sum_table .= "<td>";
+// 	$sum_table .="<a href=" . $sug_html_file . " title=\"Now Playing History\">" .$totalnumsuggestions . "</a></td>";
+// }
+
+
 if($nplarchives == 1) {
 	if($alltotalnumsuggestions < 10) $sum_table .= "<td bgcolor = \"red\">";
 	else if($alltotalnumsuggestions < 20) $sum_table .= "<td bgcolor = \"yellow\">";
 	else $sum_table .= "<td>";
-	$sum_table .= $alltotalnumsuggestions . "</td>";
+	//$sum_table .= $alltotalnumsuggestions . "</td>";
+	$sum_table .="<a href=" . "folders.htm" . " title=\"Sortable episode list\">" . $alltotalnumsuggestions . "</a></td>";
 }
 $sum_table .= "</tr>\n";
 // end of add all totals
 
 // save totals and summary
 $sum_table  .= "</table>\n</h4>\n";
+
+//xxxxxxxx 20170602 temporary Link to git hub for vicw.us
+$sum_footer .= "last code update " .$LASTUPDATE ."\n";
+$sum_footer .= "<div class=\"dura\">
+		Source can be found on GitHub:<br>
+		<a href=\"https://github.com/jradwan/tivo_now_playing\">
+		   - jradwan/tivo_now_playing Master branch</a><br>
+		<a href=\"https://github.com/TiVoHomeUser/tivo_now_playing\">
+		   - TiVoHomeUser's branch (work in progress)</a>					
+		        </div>\n";
+//xxxxxxxx
+
 $sum_footer .= "</body></html>";
-$fp1 = @fopen("summary.htm" , "w");
+$fp1 = @fopen($summaryhtm , "w");
 fwrite($fp1, $sum_header . $sum_table . $sum_footer );
 fclose($fp1);
 
@@ -624,7 +758,7 @@ fwrite ( $fp1, $sort_header . $sort_table . $sort_footer );
 fclose ( $fp1 );
 
 // ***** New 20170523 VicW
-$fp1 = @fopen ( "folders.htm", "w" );
+$fp1 = @fopen ( $foldershtm, "w" );
 fwrite($fp1, $sort_header);	// Reuused sort header from b4
 foreach($folders as $x => $x_value) {	// Procress the entire array
 	// header for each series put in loop to give each table a unique ID from the seriesid
