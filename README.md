@@ -5,7 +5,7 @@ As originally developed by gonzotek and clam729 on the TiVo Community Forum:
 
 http://archive2.tivocommunity.com/tivo-vb/showthread.php?t=218365
 
-And then further developed and enhanced by other members of TCF:
+And then further developed and enhanced by other members of TCF (like [TiVoHomeUser](https://github.com/TiVoHomeUser/tivo_now_playing)):
 
 http://www.tivocommunity.com/community/index.php?threads/now-playing-more-php-code-part-ii.371838/
 
