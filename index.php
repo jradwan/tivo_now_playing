@@ -67,6 +67,9 @@
  * 20170610 VicW
  *   changed link to github in summart to include the master branch
  *
+ * 20170610 jradwan (windracer)
+ *   format version line on summary page
+ *   use folder icon for groups link
 */
 $LASTUPDATE = "20170610";
 
@@ -135,10 +138,7 @@ $sum_header .= "<html><head>\n";
 $sum_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 $sum_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
 
-//$sum_header .= "<sh>\n<title>TiVo Disk Space - Summary</title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
-// ******* New 20170531
-$sum_header .= "<sh>\n<title>TiVo Disk Space - Summary ".$LASTUPDATE."</title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
-// *******
+$sum_header .= "<sh>\n<title>TiVo Disk Space - Summary</title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
 
 $sum_header .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 $sum_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n";
@@ -171,7 +171,7 @@ $allheader .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;
 // link to expand/collapse all entries on the page
 $allheader .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
 $allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
-$allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list2 </a></div>\n";
+$allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
 
 $allheader .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 
@@ -190,7 +190,8 @@ $sort_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"><
 $sort_header .= "<sh>\n<title> All TiVos - Sortable Episode List </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "alldvrs.htm\" >&larr;&thinsp; back to All TiVos - Now Playing </a></div>\n";
-$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list2 </a></div>\n";
+$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
+$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
 $sort_header .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 
 // header for sortable table of episodes, series ids, etc.
@@ -437,12 +438,12 @@ foreach($tivos as $tivo) {
 			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";		// Add shows title to sort table
 			
 			if ($customicon[3] != "") {
-				$folders[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
-				 $customicon[3] . ".png\" width=\"16\" height=\"16\"></td>\n";
+				$folders[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
+				 $customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 			else {
-				$folders[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
-				 "regular-recording.png\" width=\"16\" height=\"16\"></td>\n";
+				$folders[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
+				 "regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 
 			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";	// Add shows title to sort table
@@ -611,7 +612,7 @@ foreach($tivos as $tivo) {
 		//  style=\"text-align:right\"
 		//$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\">" . $tivo['shorttitle'] . "</a> </td>";
 		$sum_table .= "<td> ";
-		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "(Groups)" . "</a>";
+		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "<img src=\"" .$images. "" . "folder.png\" width=\"16\" height=\"16\">" . "</a>";
 		$sum_table .= " <a href=" . $nowPlaying . " title=\"".$tivo['shorttitle']."'s Now Playing\">" . $tivo['shorttitle'] . "</a> ";
 		$sum_table .= "</td>";
 // xxxxxxx td style="text-align:right"
@@ -665,7 +666,7 @@ $sum_table .= "<tr> "; // start of new row in the table for summary page data
 // ******* New 20170531
 //$sum_table .= "<td><a href=" . $nowPlaying . " title=\"Now Playing\" >" . "ALL" . "</a> </td>";
 $sum_table .= "<td style=\"text-align:justify\">";
-$sum_table .= " <a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "(Groups)" . "</a>";
+$sum_table .= " <a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "<img src=\"" .$images. "" . "folder.png\" width=\"16\" height=\"16\">" . "</a>";
 $sum_table .= " <a href=" . $nowPlaying . " title=\"'s Now Playing\">" .  "ALL" . "</a> ";
 $sum_table .= "</td>";
 
@@ -703,14 +704,11 @@ $sum_table .= "</tr>\n";
 $sum_table  .= "</table>\n</h4>\n";
 
 //xxxxxxxx 20170602 temporary Link to git hub for vicw.us
-$sum_footer .= "last code update " .$LASTUPDATE ."\n";
-$sum_footer .= "<div class=\"dura\">
-		Source can be found on GitHub:<br>
-		<a href=\"https://github.com/jradwan/tivo_now_playing\">
-		   - jradwan/tivo_now_playing Master branch</a><br>
-		<a href=\"https://github.com/TiVoHomeUser/tivo_now_playing\">
-		   - TiVoHomeUser's branch (work in progress)</a>					
-		        </div>\n";
+$sum_footer .= "<center><div class=\"dura\">";
+$sum_footer .= "TNPL v" .$LASTUPDATE . " - Github: 
+		<a href=\"https://github.com/jradwan/tivo_now_playing\">jradwan [master]</a> | 
+		<a href=\"https://github.com/TiVoHomeUser/tivo_now_playing\">TiVoHomeUser [fork]</a>
+		</div></center>";
 //xxxxxxxx
 
 $sum_footer .= "</body></html>";
@@ -734,7 +732,7 @@ $allfooter .= "</div>\n";
 // add a link to the summary page
 $allfooter .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 $allfooter .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
-$allfooter .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list2 </a></div>\n";
+$allfooter .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
 $allfooter .= "</body></html>";
 // end of footer for all TiVos
 
@@ -742,6 +740,8 @@ $allfooter .= "</body></html>";
 $sort_table .= "</table>\n</h4>\n";
 $sort_footer .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 $sort_footer .= "<div class=\"dura\"><a href=\"" . $myurl . "alldvrs.htm\" >&larr;&thinsp; back to All TiVos - Now Playing </a></div>\n";
+$sort_footer .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
+$sort_footer .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
 $sort_footer .= "</body></html>";
 
 // all TiVos
@@ -774,7 +774,7 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 	fwrite($fp1, "</table>\n</h4>\n");
 }
 // footer
-fwrite($fp1, "<a href=\"" . $myurl . "summary.htm\" >&larr; back to Summary page </a>");
+fwrite($fp1, $sort_footer );
 fwrite($fp1, "</body></html>");
 fclose ( $fp1 );
 // *****
