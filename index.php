@@ -774,6 +774,7 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 // footer
 fwrite($fp1, $sort_footer );
 //fwrite($fp1, "</body></html>"); // allready in sort_footer
+fwrite($fp1, "</body></html>");
 fclose ( $fp1 );
 
 ?>
