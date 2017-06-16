@@ -1,4 +1,7 @@
 <?php
+/*
+ *    added wget timeouts to tivo_settings.php wgetpath VicW (TiVo HomeUser)
+ */
 
 /*
  *  Define file locations from the point of view for index.php
@@ -15,7 +18,10 @@ $image_path = $root_path . "images" . delim ; // file path to images (TODO get t
 $xml_path = "xml/"; // temporary location for data downloaded from TiVos (may be shared with other instances of index.php)
 
 // location and running options for the wget program
-define("wgetpath", delim . "usr" . delim . "local" . delim . "bin" . delim . "wget --no-check-certificate");
+
+//define("wgetpath", delim . "usr" . delim . "local" . delim . "bin" . delim . "wget --no-check-certificate");
+define("wgetpath", delim . "usr" . delim . "local" . delim . "bin" . delim . "wget --tries 3 --timeout 60 --no-check-certificate");
+
 define("tivoport", "80");
 
 
