@@ -78,8 +78,12 @@
  *   Group displays off-line for the off-line DVR same as NowPlaying
  *   Total drive size in summary now excludes off-line DVR's in it's cacluations
  *   
+ * 20170618
+ *   Collaspale Groups
+ *   
+ *   
 */
-$LASTUPDATE = "20170615";
+$LASTUPDATE = "20170618";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -420,6 +424,9 @@ foreach($tivos as $tivo) {
 				"\">" .  tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) . "</td>";
 			$sort_table .= "</tr>\n";
 
+			$groups_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];				// A solution to save the series name
+			$groups_count[$tivoarray [$i] ['seriesid']] = $groups_count[$tivoarray [$i] ['seriesid']] +1; // Count the episodes
+			
 			$groups[$tivoarray [$i] ['seriesid']] .= "<tr>";										// add the TiVo's name for the first field in the sort table
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";		// Add shows title to sort table
 				
@@ -437,10 +444,10 @@ foreach($tivos as $tivo) {
 			$groups[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
 					tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .						// Record date index on sortable numeric value
 					tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";					// Record date viewable format
+
 			// Note: ProgrameID and Series are for testing may be removed one or both in the future
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
-				
 
 			$folders[$tivoarray [$i] ['seriesid']] .= "<tr>";										// add the TiVo's name for the first field in the sort table
 			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";		// Add shows title to sort table
@@ -534,11 +541,19 @@ foreach($tivos as $tivo) {
 	fwrite($fp1, $header . $content . $footer);
 	fclose($fp1);
 
-
+$i=0;
 	$fp1 = @fopen($nowPlayingGroups, "w");
 	fwrite($fp1, $header . "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n");
 	foreach($groups as $x => $x_value) {	// Procress the entire array
+$i++;
 		// header for each series put in loop to give each table a unique ID from the seriesid
+				
+		//fwrite($fp1, "<img src=\"file:///Users/imac/Documents/workspace/tivo_now_playing-master.org/tivo_now_playing-1.4/images/checkbox.png\" id=\"plusminus".$i."\" onclick=\"toggleItem(".$i.")\" border=\"0\" width=\"14\" height=\"14\">");
+		//fwrite($fp1, "<div><span class=\"name\">" . $groups_series[$x] . "</span> - <span class=\"eptitle\">".$i."</span> <a> ( " . $groups_count[$x] . " Episodes ) </a>\n");
+		fwrite($fp1, "<img src=\"" .$images. "checkbox.png\" id=\"plusminus".$i."\" onclick=\"toggleItem(".$i.")\" border=\"0\" width=\"14\" height=\"14\">");
+		fwrite($fp1, "<div><span class=\"name\">" . $groups_series[$x] . "</span> - <span class=\"eptitle\">".$i."</span> <a> ( " . $groups_count[$x] . " Episodes ) </a>\n");
+		fwrite($fp1, "<div class=\"item\" id=\"myTbody".$i."\">\n");
+		
 		fwrite($fp1, "<h4>\n<br><table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
 		fwrite($fp1, "	<tr>
 					<th> TiVo </th>
@@ -551,9 +566,10 @@ foreach($tivos as $tivo) {
 					</tr>\n");
 	
 		fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
-		fwrite($fp1, "</table>\n</h4>\n");
+		fwrite($fp1, "</table>\n</h4></div>\n</div>\n<br>");
+		
 	}	
-	fwrite($fp1, $fotter);
+	fwrite($fp1, $footer);
 
 	if($nplarchives == 1) {	
 	 	// archive loop Update once in the first 15 minutes of the hour
