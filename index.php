@@ -79,10 +79,12 @@
  *   Total drive size in summary now excludes off-line DVR's in it's cacluations
  *   
  * 20170618
- *   Collaspale Groups
+ *   Collaspale Groups working
  *   
  * 20170619
  *  Added new old dates to collaspale header's
+ *  TODO toggle All not working with sort tables
+ *  
  *   
 */
 $LASTUPDATE = "20170619";
@@ -152,9 +154,11 @@ $sum_header .= "<html><head>\n";
 $sum_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 $sum_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
 
-$sum_header .= 	// "<sh>		What is this sh tag for causes </head> to flag an error?
-		"<title>TiVo Disk Space - Summary</title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\">";
-				//</sh>\n";
+$sum_header .=
+	 	// "<sh>		What is this sh tag for causes </head> to flag an error?
+		"<title>TiVo Disk Space - Summary</title>
+		<link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\">";
+		//</sh>\n"; ?????
 $sum_header .= "\n</head>\n<body>\n";
 
 $sum_header .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
@@ -185,10 +189,11 @@ $allheader .= "<body onload=\"init()\">\n";
 // link back to Summary page at top 
 $allheader .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 
-// link to expand/collapse all entries on the page
-$allheader .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
 $allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
 $allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
+
+// link to expand/collapse all entries on the page
+$allheader .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
 
 $allheader .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 
@@ -203,13 +208,22 @@ $sort_header .= "<!DOCTYPE html>\n";
 $sort_header .= "<html><head>\n";
 $sort_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 $sort_header .= "<LINK REL=\"shortcut icon\" HREF=\"" . $images . "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
-$sort_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n";
 $sort_header .= "\n<title> All TiVos - Sortable Episode List </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></head>\n\n";
+$sort_header .= "<body onload=\"init()\">\n";
+
+//	Links
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "alldvrs.htm\" >&larr;&thinsp; back to All TiVos - Now Playing </a></div>\n";
-$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
+$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
-$sort_header .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
+
+// link to expand/collapse all entries on the page
+$sort_header .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
+
+$sort_header .= "<h1><img src=images/tivo_logo.png > <br> All Now Playing</h1>\n <h2>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
+$sort_header .= "<script id=\"imagepath\"> \"" . $images . "\" </script>\n";
+$sort_header .= "<script src=\"" . $mytjs . "\" > </script>\n";
+$sort_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n";
 
 // header for sortable table of episodes, series ids, etc.
 $sort_table .= "<br>\n<h4>\n<table id=\"Summary\" class=\"sortable\" border=\"1\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n";
@@ -279,7 +293,7 @@ foreach($tivos as $tivo) {
 		include($binpath . "rss.php");	// rss code moved to external file rss.php
 	} 
 
-	$header .= "<!DOCTYPE html\n>"; 
+	$header .= "<!DOCTYPE html>\n"; 
 	$header .= "<html><head>\n";
 	$header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 	$header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
@@ -287,10 +301,10 @@ foreach($tivos as $tivo) {
 	$header .= "<body onload=\"init()\">\n";
 
 	// add link back to Summary page at top 
-	$header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
+ 	$header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 
 	// link to expand/collapse all entries on the page
-	$header .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
+ 	$header .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
 
 	if (file_exists("$image_path". "tivo_" . $tivo['model'] . ".png")){
 		$header .= "<h1> <img src=\"" .$images. "tivo_" . $tivo['model'] . ".png\"><br>" . $tivo['nowplaying'] . " </h1>\n";
@@ -570,8 +584,8 @@ foreach($tivos as $tivo) {
 	foreach($groups as $x => $x_value) {	// Procress the entire array
 		$series_count++;
 		// header for each series put in loop to give each table a unique ID from the seriesid
-		fwrite($fp1, "<img src=\"" .$images. "checkbox.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">");
-		fwrite($fp1, "<div><span class=\"name\">" . $groups_series[$x] . "</span> - <span class=\"eptitle\">".$series_count."</span> <a> ( " . $groups_count[$x] . " Episodes ) </a>\n");
+		fwrite($fp1, "<div><img src=\"" .$images. "checkbox.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
+		fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span> - <span class=\"eptitle\">".$series_count."</span> <a> ( " . $groups_count[$x] . " Episodes ) </a>\n");
 		fwrite($fp1, tivoDate(" F j, Y, g:i a ", $groups_olddate[$x]));
 		if($groups_count[$x] > 1)
 			fwrite($fp1, " --> " . tivoDate("F j, Y, g:i a", $groups_newdate[$x]));		
@@ -790,16 +804,15 @@ $fp1 = @fopen ( "sort.htm", "w" );
 fwrite ( $fp1, $sort_header . $sort_table . $sort_footer );
 fclose ( $fp1 );
 
-
-//xxxxxxxxxxxxxxxxx
 $series_count=0;	// Used to create a unique handle for each group
 $fp1 = @fopen($foldershtm, "w");
-fwrite($fp1, $sort_header . "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n");
+fwrite($fp1, $sort_header); // . "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n");
+
 foreach($folders as $x => $x_value) {	// Procress the entire array
 	$series_count++;
 	// header for each series put in loop to give each table a unique ID from the seriesid
-	fwrite($fp1, "<img src=\"" .$images. "checkbox.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">");
-	fwrite($fp1, "<div><span class=\"name\">" . $folders_series[$x] . "</span> - <span class=\"eptitle\">".$series_count."</span> <a> ( " . $folders_count[$x] . " Episodes ) </a>\n");
+	fwrite($fp1, "<div><img src=\"" .$images. "checkbox.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
+	fwrite($fp1, "<span class=\"name\">" . $folders_series[$x] . "</span> - <span class=\"eptitle\">".$series_count."</span> <a> ( " . $folders_count[$x] . " Episodes ) </a>\n");
 	fwrite($fp1, tivoDate(" F j, Y, g:i a ", $folders_olddate[$x]));
 	if($folders_count[$x] > 1)
 		fwrite($fp1, " --> " . tivoDate("F j, Y, g:i a", $folders_newdate[$x]));
@@ -818,26 +831,6 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 	fwrite($fp1, "</table>\n</h4></div>\n</div>\n<br>");
 }
 
-//xxxxxxxxxxxxxxxxx
-// $fp1 = @fopen ( $foldershtm, "w" );
-// fwrite($fp1, $sort_header);	// Reuused sort header from b4
-// foreach($folders as $x => $x_value) {	// Procress the entire array
-// 	// header for each series put in loop to give each table a unique ID from the seriesid
-// 	fwrite($fp1, "<h4>\n<br><table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
-// 	fwrite($fp1, "	<tr>
-// 					<th> TiVo </th>
-// 					<th class=\"sorttable\"> Status </th>
-// 					<th class=\"sorttable\"> Series Name </th>
-// 					<th class=\"sorttable\"> Episode </th>
-// 					<th class=\"sorttable_numeric\"> Record Date </th>
-// 					<th class=\"sorttable\"> Program ID </th>
-// 					<th class=\"sorttable\"> Series ID </th>
-// 					</tr>\n");
-
-// 	fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
-// 	fwrite($fp1, "</table>\n</h4>\n");
-// }
-// footer
 fwrite($fp1, $sort_footer );
 //fwrite($fp1, "</body></html>"); // allready in sort_footer
 fclose ( $fp1 );
