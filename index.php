@@ -76,13 +76,13 @@
  *   Fixed the corrupt table with missing DVR(s)
  *   Added wget timeouts to tivo_settings.php wgetpath
  *   Group displays off-line for the off-line DVR same as NowPlaying
- *   Total drive size in summary now excludes off-line DVR's in it's cacluations
+ *   Total drive size in summary now excludes off-line DVR's in it's calculations
  *   
  * 20170618
  *   Collaspale Groups working
  *   
  * 20170619
- *  Added new old dates to collaspale header's
+ *  Added new old dates to collapsible header's
  *  TODO toggle All not working with sort tables
  *  
  *   
@@ -240,7 +240,9 @@ $sort_table .= " <tr>
 foreach($tivos as $tivo) {
 	unset($tivoarray, $totalsize, $totallength, $customicon, $sc, $totalitems, $freespace, $rssheader, $rsscontent, $rssfooter, $header,
 			 $content, $footer, $fp1, $fp2, $totalsuggestions, $totalnumsuggestions, $percent_free, $fpt, $auto_size_gb, $recording_suggestion,
-			 $sug_header, $sug_table, $sug_footer, $sug_html_file, $sug_log_file, $sug_html_file, $archNowPlaying, $nowPlaying, $groups);
+			 $sug_header, $sug_table, $sug_footer, $sug_html_file, $sug_log_file, $sug_html_file, $archNowPlaying, $nowPlaying,
+			 $groups, $groups_series, $groups_count, $groups_newdate, $groups_newdate);
+	
 
 	// collect the data for the TiVo
 	$tivoxml = new Tivo_XML();
@@ -447,7 +449,7 @@ foreach($tivos as $tivo) {
 			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['seriesid']])		// Youngest recording
 			$groups_newdate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
 
-			if($tivoarray [$i] ['capturedate'] <= $groups_newdate[$tivoarray [$i] ['seriesid']])		// Oldest recording
+			if($tivoarray [$i] ['capturedate'] <= $groups_olddate[$tivoarray [$i] ['seriesid']])		// Oldest recording
 			$groups_olddate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
 			// End collect info for the collapsible tables header
 			
