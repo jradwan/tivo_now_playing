@@ -241,7 +241,7 @@ foreach($tivos as $tivo) {
 	unset($tivoarray, $totalsize, $totallength, $customicon, $sc, $totalitems, $freespace, $rssheader, $rsscontent, $rssfooter, $header,
 			 $content, $footer, $fp1, $fp2, $totalsuggestions, $totalnumsuggestions, $percent_free, $fpt, $auto_size_gb, $recording_suggestion,
 			 $sug_header, $sug_table, $sug_footer, $sug_html_file, $sug_log_file, $sug_html_file, $archNowPlaying, $nowPlaying,
-			 $groups, $groups_series, $groups_count, $groups_newdate, $groups_newdate);
+			 $groups, $groups_series, $groups_count, $groups_newdate, $groups_olddate);
 	
 
 	// collect the data for the TiVo
