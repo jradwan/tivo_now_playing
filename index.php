@@ -33,8 +33,8 @@
  *  clean up totals block (css)
  *
  * 20170516 jradwan (windracer)
- * add sortable table with episode/series info
- * more graphical updates, css tweaks
+ *  add sortable table with episode/series info
+ *  more graphical updates, css tweaks
  *
  * 20170523 VicW TiVoHomeUser (homeuser)
  *  Added Sortable tables grouped by seriesid by putting everything
@@ -50,46 +50,46 @@
  *  added tivo short name to message in Suggestions link
  *
  * 20170531 VicW
- *   Sortable tables grouped by seriesid for each DVR
- *   Added $LASTUPDATE for reference in summary header
- *   summary TiVo name now has (Grouped) link to Grouped Now Playing
+ *  Sortable tables grouped by seriesid for each DVR
+ *  Added $LASTUPDATE for reference in summary header
+ *  summary TiVo name now has (Grouped) link to Grouped Now Playing
  *
  * 20170602 VicW
- *   Added link to TiVoHomeUser's branch at github to the bottom of the summary page.
- *   06/-3  modified link's verbage
+ *  Added link to TiVoHomeUser's branch at github to the bottom of the summary page.
+ *  06/-3  modified link's verbage
  *
  * 20170606 VicW
- *   Swapped Groups and TiVo name in summary header
+ *  Swapped Groups and TiVo name in summary header
  *
  * 20170608 VicW
- *   Changed Grouped to Groups
+ *  Changed Grouped to Groups
  *
  * 20170610 VicW
- *   changed link to github in summary to include the master branch
+ *  changed link to github in summary to include the master branch
  *
  * 20170610 jradwan (windracer)
- *   format version line on summary page
- *   use folder icon for groups link
+ *  format version line on summary page
+ *  use folder icon for groups link
  *
  * 20170615 VicW  (TiVoHomeUser)
- *   Cleanup some Html syntax errors missing closing tags
- *   Fixed the corrupt table with missing DVR(s)
- *   Added wget timeouts to tivo_settings.php wgetpath
- *   Group displays off-line for the off-line DVR same as NowPlaying
- *   Total drive size in summary now excludes off-line DVRs in its calculations
+ *  Cleanup some Html syntax errors missing closing tags
+ *  Fixed the corrupt table with missing DVR(s)
+ *  Added wget timeouts to tivo_settings.php wgetpath
+ *  Group displays off-line for the off-line DVR same as NowPlaying
+ *  Total drive size in summary now excludes off-line DVRs in its calculations
  *
  * 20170618 Vicw
- *   Collapsible Groups working
+ *  Collapsible Groups working
  *
  * 20170619 VicW
- *   Added new old dates to collapsible headers
- *   TODO toggle All not working with sort tables
+ *  Added new old dates to collapsible headers
+ *  TODO toggle All not working with sort tables
  *
  * 20170620 VicW
- *   Fixed some typos and removed obsolete commented out code
- *   Unset the new $group arrays for each tivo loop
- *   Removed the series count from folders/groups easily confused number of episodes
- *   fix for olddate uninitialized null would never test older initialized both old and new JIC
+ *  Fixed some typos and removed obsolete commented out code
+ *  Unset the new $group arrays for each tivo loop
+ *  Removed the series count from folders/groups easily confused number of episodes
+ *  fix for olddate uninitialized null would never test older initialized both old and new JIC
  *
 */
 $LASTUPDATE = "20170620";
@@ -213,7 +213,7 @@ $sort_header .= "<LINK REL=\"shortcut icon\" HREF=\"" . $images . "favicon.ico\"
 $sort_header .= "\n<title> All TiVos - Sortable Episode List </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></head>\n\n";
 $sort_header .= "<body onload=\"init()\">\n";
 
-//	Links between our own pages
+// links between our own pages
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "alldvrs.htm\" >&larr;&thinsp; back to All TiVos - Now Playing </a></div>\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
@@ -445,7 +445,7 @@ foreach($tivos as $tivo) {
 			$sort_table .= "</tr>\n";
 
 			// Collect info for the collapsible tables header
-			// save the series name and count the episodes (a multidimensional arry would be better)
+			// save the series name and count the episodes (a multidimensional array would be better)
 			$groups_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];
 			$groups_count[$tivoarray [$i] ['seriesid']]++;
 
