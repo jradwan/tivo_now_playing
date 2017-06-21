@@ -12,7 +12,7 @@
  *  Combined now playing for all TiVos
  *  URL path allowing generation when HTML files are not published on local computer
  *  Other changes that I have forgot about.
- *    I added something to the program information like series ID.
+ *  I added something to the program information like series ID.
  *
  * 20170429 jradwan (windracer)
  *  added 'back to Summary' link at top of page
@@ -41,13 +41,13 @@
  *  in an indexed array $folders adding additional rows every time the same seriesid
  *  is encountered.
  *
- *  20170527 VicW (TiVoHomeUser)
- *   Moved write for _track_drive_size.log inside the size check block.
- *   Now the log file is only writen to when the computed storage size has changed.
+ * 20170527 VicW (TiVoHomeUser)
+ *  Moved write for _track_drive_size.log inside the size check block.
+ *  Now the log file is only writen to when the computed storage size has changed.
  *
- *  20170528 VicW
- *   Link to folders from All Suggestions
- *   added tivo short name to message in Suggestions link
+ * 20170528 VicW
+ *  Link to folders from All Suggestions
+ *  added tivo short name to message in Suggestions link
  *
  * 20170531 VicW
  *   Sortable tables grouped by seriesid for each DVR
@@ -76,13 +76,13 @@
  *   Fixed the corrupt table with missing DVR(s)
  *   Added wget timeouts to tivo_settings.php wgetpath
  *   Group displays off-line for the off-line DVR same as NowPlaying
- *   Total drive size in summary now excludes off-line DVR's in it's calculations
+ *   Total drive size in summary now excludes off-line DVRs in its calculations
  *
  * 20170618 Vicw
  *   Collapsible Groups working
  *
  * 20170619 VicW
- *   Added new old dates to collapsible header's
+ *   Added new old dates to collapsible headers
  *   TODO toggle All not working with sort tables
  *
  * 20170620 VicW
@@ -90,7 +90,6 @@
  *   Unset the new $group arrays for each tivo loop
  *   Removed the series count from folders/groups easily confused number of episodes
  *   fix for olddate uninitialized null would never test older initialized both old and new JIC
- *
  *
 */
 $LASTUPDATE = "20170620";
@@ -160,10 +159,8 @@ $sum_header .= "<html><head>\n";
 $sum_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 $sum_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
 
-$sum_header .=
-		"<title>TiVo Disk Space - Summary</title>
-		<link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\">";
-
+$sum_header .= "<title>TiVo Disk Space - Summary</title>
+    <link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\">";
 $sum_header .= "\n</head>\n<body>\n";
 
 $sum_header .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
@@ -220,7 +217,7 @@ $sort_header .= "<body onload=\"init()\">\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "alldvrs.htm\" >&larr;&thinsp; back to All TiVos - Now Playing </a></div>\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
-$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
+$sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
 
 // link to expand/collapse all entries on the page
 $sort_header .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
@@ -448,25 +445,25 @@ foreach($tivos as $tivo) {
 			$sort_table .= "</tr>\n";
 
 			// Collect info for the collapsible tables header
-			$groups_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];				// A simple solution to save the series name and
-			$groups_count[$tivoarray [$i] ['seriesid']]++; 											// Count episodes. a multidimensional arry would be better
+			// save the series name and count the episodes (a multidimensional arry would be better)
+			$groups_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];
+			$groups_count[$tivoarray [$i] ['seriesid']]++;
 
-			// preload a valid date first encounter
-			if($groups_newdate[$tivoarray [$i] ['seriesid']] == "")
-				$groups_newdate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
-			if($groups_olddate[$tivoarray [$i] ['seriesid']] == "")
-				$groups_olddate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
-
-			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['seriesid']])	// Youngest recording
-			$groups_newdate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
-
-			if($tivoarray [$i] ['capturedate'] <= $groups_olddate[$tivoarray [$i] ['seriesid']])	// Oldest recording
-			$groups_olddate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
+			// youngest recording
+			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['seriesid']]) {
+				$groups_newdate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
+			}
+			// oldest recording
+			if($tivoarray [$i] ['capturedate'] <= $groups_olddate[$tivoarray [$i] ['seriesid']]) {
+				$groups_olddate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
+			}
 			// End collect info for the collapsible tables header
-
-			$groups[$tivoarray [$i] ['seriesid']] .= "<tr>";										// add the TiVo's name for the first field in the sort table
-			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";		// Add shows title to sort table
-
+			
+			// add the TiVo's name for the first field in the sort table
+			$groups[$tivoarray [$i] ['seriesid']] .= "<tr>";
+			// add shows title to sort table
+			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
+				
 			if ($customicon[3] != "") {
 				$groups[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
 						$customicon[3] . ".png\" width=\"16\" height=\"16\"></td>\n";
@@ -475,39 +472,40 @@ foreach($tivos as $tivo) {
 				$groups[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
 						"regular-recording.png\" width=\"16\" height=\"16\"></td>\n";
 			}
-
-			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";		// Add shows title to sort table
+			// add shows title to sort table
+			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
 			$groups[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
-					tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .						// Record date index on sortable numeric value
-					tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";				// Record date viewable format
+				// record date index on sortable numeric value
+				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .
+				// record date viewable format
+				tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";
 
-			// Note: ProgrameID and Series are for testing may be removed one or both in the future
+			// Note: ProgramID and Series are for testing may be removed one or both in the future
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 
-
-			// Collect for ALL DVR's
-			// Collect info for the collapsible tables header for (ALL)
-			$folders_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];					// A solution to save the series name
-			$folders_count[$tivoarray [$i] ['seriesid']]++; 											// Count the episodes
-
-			// preload a valid date first encounter
-			if($folders_newdate[$tivoarray [$i] ['seriesid']] == "")
-				$folders_newdate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
-			if($folders_olddate[$tivoarray [$i] ['seriesid']] == "")
-				$folders_olddate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
-
-			if($tivoarray [$i] ['capturedate'] >= $folders_newdate[$tivoarray [$i] ['seriesid']])		// Youngest recording
+			// Collect info for the collapsible tables header for ALL DVRs
+			// save the series name
+			$folders_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];
+			// count the episodes
+			$folders_count[$tivoarray [$i] ['seriesid']]++;
+			
+			// youngest recording
+			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['seriesid']]) {
 				$folders_newdate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
-
-			if($tivoarray [$i] ['capturedate'] <= $folders_olddate[$tivoarray [$i] ['seriesid']])		// Oldest recording
+			}
+			// oldest recording
+			if($tivoarray [$i] ['capturedate'] <= $groups_olddate[$tivoarray [$i] ['seriesid']]) {
 				$folders_olddate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
-			// End collect info for the collapsible tables header (ALL)
-
-			$folders[$tivoarray [$i] ['seriesid']] .= "<tr>";											// add the TiVo's name for the first field in the sort table
-			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";			// Add shows title to sort table
-
+			}
+			// End collect info for the collapsible tables header for ALL DVRs
+					
+			// add the TiVo's name for the first field in the sort table
+			$folders[$tivoarray [$i] ['seriesid']] .= "<tr>";
+			// add show's title to sort table
+			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
+			
 			if ($customicon[3] != "") {
 				$folders[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
 				 $customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
@@ -517,12 +515,16 @@ foreach($tivos as $tivo) {
 				 "regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 
-			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";		// Add shows title to sort table
+			// add show's title to sort table
+			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
 			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
 			$folders[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
-					tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .						// Record date index on sortable numeric value
-					tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";				// Record date viewable format
-			// Note: ProgrameID and Series are for testing may be removed one or both in the future
+				// record date index on sortable numeric value
+				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .
+				// record date viewable format
+				tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";
+
+			// Note: ProgramID and Series are for testing may be removed one or both in the future
 			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
 			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 
@@ -842,6 +844,7 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 }
 
 fwrite($fp1, $sort_footer );
+fwrite($fp1, "</body></html>");
 fclose ( $fp1 );
 
 ?>
