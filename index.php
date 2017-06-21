@@ -449,6 +449,12 @@ foreach($tivos as $tivo) {
 			$groups_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];
 			$groups_count[$tivoarray [$i] ['seriesid']]++;
 
+			// preload a valid date first encounter
+			if($groups_newdate[$tivoarray [$i] ['seriesid']] == "")
+ 				$groups_newdate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
+ 			if($groups_olddate[$tivoarray [$i] ['seriesid']] == "")
+ 				$groups_olddate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
+
 			// youngest recording
 			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['seriesid']]) {
 				$groups_newdate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
@@ -486,10 +492,15 @@ foreach($tivos as $tivo) {
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 
 			// Collect info for the collapsible tables header for ALL DVRs
-			// save the series name
+			// save the series name and count the episodes (a multidimensional array would be better)
 			$folders_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];
-			// count the episodes
 			$folders_count[$tivoarray [$i] ['seriesid']]++;
+
+			// preload a valid date first encounter
+ 			if($folders_newdate[$tivoarray [$i] ['seriesid']] == "")
+ 				$folders_newdate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
+ 			if($folders_olddate[$tivoarray [$i] ['seriesid']] == "")
+ 				$folders_olddate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
 			
 			// youngest recording
 			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['seriesid']]) {
