@@ -616,7 +616,7 @@ foreach($tivos as $tivo) {
 	foreach($groups as $x => $x_value) {	// Procress the entire array
 		$series_count++;
 		// header for each series put in loop to give each table a unique ID from the seriesid
-		fwrite($fp1, "<div><img src=\"" .$images. "checkbox.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
+		fwrite($fp1, "<div><img src=\"" .$images. "folder.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
 		fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span><span class=\"desc\"> (" . $groups_count[$x]);
 		if ($groups_count[$x] > 1) {
 			fwrite($fp1, " episodes; ");
@@ -841,7 +841,7 @@ fwrite($fp1, $sort_header);
 foreach($folders as $x => $x_value) {	// Procress the entire array
 	$series_count++;
 	// header for each series put in loop to give each table a unique ID from the seriesid
-	fwrite($fp1, "<div><img src=\"" .$images. "checkbox.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
+	fwrite($fp1, "<div><img src=\"" .$images. "folder.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
 	fwrite($fp1, "<span class=\"name\">" . $folders_series[$x] . "</span><span class=\"desc\"> (" . $folders_count[$x]);
 	if ($folders_count[$x] > 1) {
 		fwrite($fp1, " episodes; ");

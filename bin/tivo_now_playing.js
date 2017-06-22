@@ -107,17 +107,25 @@ function showHide(num)
      if(!objToggleItem)
          return false;
 
-   // if(objToggleItem.style.display == 'none') // breaks toggles in FireFox
    if(objToggleItem.style.display == '' || objToggleItem.style.display == 'none')
      {
          objToggleItem.style.display = 'block';
-         objPlusMinusImage.src = imagePath + "checkbox-selected.png";
+         if(objPlusMinusImage.src == imagePath + "checkbox.png") {
+            objPlusMinusImage.src = imagePath + "checkbox-selected.png";
+         } 
+         else {
+            objPlusMinusImage.src = imagePath + "folder-open.png";
+         }
      }
-
      else
      {
          objToggleItem.style.display = 'none';
-         objPlusMinusImage.src = imagePath + "checkbox.png";
+         if(objPlusMinusImage.src == imagePath + "checkbox-selected.png") {
+            objPlusMinusImage.src = imagePath + "checkbox.png";
+         }
+         else {
+            objPlusMinusImage.src = imagePath + "folder.png";
+         }
      }
    return true;
 }
