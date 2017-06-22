@@ -471,12 +471,12 @@ foreach($tivos as $tivo) {
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
 				
 			if ($customicon[3] != "") {
-				$groups[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
-						$customicon[3] . ".png\" width=\"16\" height=\"16\"></td>\n";
+				$groups[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
+						$customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 			else {
-				$groups[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
-						"regular-recording.png\" width=\"16\" height=\"16\"></td>\n";
+				$groups[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
+						"regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 			// add shows title to sort table
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
@@ -617,12 +617,19 @@ foreach($tivos as $tivo) {
 		$series_count++;
 		// header for each series put in loop to give each table a unique ID from the seriesid
 		fwrite($fp1, "<div><img src=\"" .$images. "checkbox.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
-		fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span> - <span class=\"eptitle\"></span> <a> ( " . $groups_count[$x] . " Episodes ) </a>\n");
-		fwrite($fp1, tivoDate(" F j, Y, g:i a ", $groups_olddate[$x]));
+		fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span><span class=\"desc\"> (" . $groups_count[$x]);
+		if ($groups_count[$x] > 1) {
+			fwrite($fp1, " episodes; ");
+		}
+		else {
+			fwrite($fp1, " episode; ");
+		}
+		fwrite($fp1, tivoDate("F j, Y, g:i a", $groups_olddate[$x]));
 		if($groups_count[$x] > 1)
-			fwrite($fp1, " --> " . tivoDate("F j, Y, g:i a", $groups_newdate[$x]));
+			fwrite($fp1, " &rarr; " . tivoDate("F j, Y, g:i a", $groups_newdate[$x]));
+		fwrite($fp1, ") </span>");
 		fwrite($fp1, "<div class=\"item\" id=\"myTbody".$series_count."\">\n");
-		fwrite($fp1, "<h4>\n<br><table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
+		fwrite($fp1, "<h4>\n<table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
 		fwrite($fp1, "	<tr>
 					<th> TiVo </th>
 					<th class=\"sorttable\"> Status </th>
@@ -633,7 +640,7 @@ foreach($tivos as $tivo) {
 					<th class=\"sorttable\"> Series ID </th>
 					</tr>\n");
 		fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
-		fwrite($fp1, "</table>\n</h4></div>\n</div>\n<br>");
+		fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
 	}
 
 	fwrite($fp1, $footer);
@@ -835,12 +842,19 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 	$series_count++;
 	// header for each series put in loop to give each table a unique ID from the seriesid
 	fwrite($fp1, "<div><img src=\"" .$images. "checkbox.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
-	fwrite($fp1, "<span class=\"name\">" . $folders_series[$x] . "</span> - <span class=\"eptitle\"></span> <a> ( " . $folders_count[$x] . " Episodes ) </a>\n");
-	fwrite($fp1, tivoDate(" F j, Y, g:i a ", $folders_olddate[$x]));
+	fwrite($fp1, "<span class=\"name\">" . $folders_series[$x] . "</span><span class=\"desc\"> (" . $folders_count[$x]);
+	if ($folders_count[$x] > 1) {
+		fwrite($fp1, " episodes; ");
+	}
+	else {
+		fwrite($fp1, " episode; ");
+	}
+	fwrite($fp1, tivoDate("F j, Y, g:i a", $folders_olddate[$x]));
 	if($folders_count[$x] > 1)
-		fwrite($fp1, " --> " . tivoDate("F j, Y, g:i a", $folders_newdate[$x]));
+		fwrite($fp1, " &rarr; " . tivoDate("F j, Y, g:i a", $folders_newdate[$x]));
+	fwrite($fp1, ") </span>");
 	fwrite($fp1, "<div class=\"item\" id=\"myTbody".$series_count."\">\n");
-	fwrite($fp1, "<h4>\n<br><table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
+	fwrite($fp1, "<h4>\n<table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
 	fwrite($fp1, "	<tr>
 					<th> TiVo </th>
 					<th class=\"sorttable\"> Status </th>
@@ -851,7 +865,7 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 					<th class=\"sorttable\"> Series ID </th>
 					</tr>\n");
 	fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
-	fwrite($fp1, "</table>\n</h4></div>\n</div>\n<br>");
+	fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
 }
 
 fwrite($fp1, $sort_footer );
