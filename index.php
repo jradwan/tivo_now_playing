@@ -33,8 +33,8 @@
  *  clean up totals block (css)
  *
  * 20170516 jradwan (windracer)
- * add sortable table with episode/series info
- * more graphical updates, css tweaks
+ *  add sortable table with episode/series info
+ *  more graphical updates, css tweaks
  *
  * 20170523 VicW TiVoHomeUser (homeuser)
  *  Added Sortable tables grouped by seriesid by putting everything
@@ -50,46 +50,46 @@
  *  added tivo short name to message in Suggestions link
  *
  * 20170531 VicW
- *   Sortable tables grouped by seriesid for each DVR
- *   Added $LASTUPDATE for reference in summary header
- *   summary TiVo name now has (Grouped) link to Grouped Now Playing
+ *  Sortable tables grouped by seriesid for each DVR
+ *  Added $LASTUPDATE for reference in summary header
+ *  summary TiVo name now has (Grouped) link to Grouped Now Playing
  *
  * 20170602 VicW
- *   Added link to TiVoHomeUser's branch at github to the bottom of the summary page.
- *   06/-3  modified link's verbage
+ *  Added link to TiVoHomeUser's branch at github to the bottom of the summary page.
+ *  06/-3  modified link's verbage
  *
  * 20170606 VicW
- *   Swapped Groups and TiVo name in summary header
+ *  Swapped Groups and TiVo name in summary header
  *
  * 20170608 VicW
- *   Changed Grouped to Groups
+ *  Changed Grouped to Groups
  *
  * 20170610 VicW
- *   changed link to github in summary to include the master branch
+ *  changed link to github in summary to include the master branch
  *
  * 20170610 jradwan (windracer)
- *   format version line on summary page
- *   use folder icon for groups link
+ *  format version line on summary page
+ *  use folder icon for groups link
  *
  * 20170615 VicW  (TiVoHomeUser)
- *   Cleanup some Html syntax errors missing closing tags
- *   Fixed the corrupt table with missing DVR(s)
- *   Added wget timeouts to tivo_settings.php wgetpath
- *   Group displays off-line for the off-line DVR same as NowPlaying
- *   Total drive size in summary now excludes off-line DVRs in its calculations
+ *  Cleanup some Html syntax errors missing closing tags
+ *  Fixed the corrupt table with missing DVR(s)
+ *  Added wget timeouts to tivo_settings.php wgetpath
+ *  Group displays off-line for the off-line DVR same as NowPlaying
+ *  Total drive size in summary now excludes off-line DVRs in its calculations
  *
  * 20170618 Vicw
- *   Collapsible Groups working
+ *  Collapsible Groups working
  *
  * 20170619 VicW
- *   Added new old dates to collapsible headers
- *   TODO toggle All not working with sort tables
+ *  Added new old dates to collapsible headers
+ *  TODO toggle All not working with sort tables
  *
  * 20170620 VicW
- *   Fixed some typos and removed obsolete commented out code
- *   Unset the new $group arrays for each tivo loop
- *   Removed the series count from folders/groups easily confused number of episodes
- *   fix for olddate uninitialized null would never test older initialized both old and new JIC
+ *  Fixed some typos and removed obsolete commented out code
+ *  Unset the new $group arrays for each tivo loop
+ *  Removed the series count from folders/groups easily confused number of episodes
+ *  fix for olddate uninitialized null would never test older initialized both old and new JIC
  *
 */
 $LASTUPDATE = "20170620";
@@ -213,7 +213,7 @@ $sort_header .= "<LINK REL=\"shortcut icon\" HREF=\"" . $images . "favicon.ico\"
 $sort_header .= "\n<title> All TiVos - Sortable Episode List </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></head>\n\n";
 $sort_header .= "<body onload=\"init()\">\n";
 
-//	Links between our own pages
+// links between our own pages
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "alldvrs.htm\" >&larr;&thinsp; back to All TiVos - Now Playing </a></div>\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
@@ -445,9 +445,15 @@ foreach($tivos as $tivo) {
 			$sort_table .= "</tr>\n";
 
 			// Collect info for the collapsible tables header
-			// save the series name and count the episodes (a multidimensional arry would be better)
+			// save the series name and count the episodes (a multidimensional array would be better)
 			$groups_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];
 			$groups_count[$tivoarray [$i] ['seriesid']]++;
+
+			// preload a valid date first encounter
+			if($groups_newdate[$tivoarray [$i] ['seriesid']] == "")
+ 				$groups_newdate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
+ 			if($groups_olddate[$tivoarray [$i] ['seriesid']] == "")
+ 				$groups_olddate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
 
 			// youngest recording
 			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['seriesid']]) {
@@ -465,12 +471,12 @@ foreach($tivos as $tivo) {
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
 				
 			if ($customicon[3] != "") {
-				$groups[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
-						$customicon[3] . ".png\" width=\"16\" height=\"16\"></td>\n";
+				$groups[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
+						$customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 			else {
-				$groups[$tivoarray [$i] ['seriesid']] .= "<td><img src=\"" .$images. "" .
-						"regular-recording.png\" width=\"16\" height=\"16\"></td>\n";
+				$groups[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
+						"regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 			// add shows title to sort table
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
@@ -486,10 +492,15 @@ foreach($tivos as $tivo) {
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 
 			// Collect info for the collapsible tables header for ALL DVRs
-			// save the series name
+			// save the series name and count the episodes (a multidimensional array would be better)
 			$folders_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];
-			// count the episodes
 			$folders_count[$tivoarray [$i] ['seriesid']]++;
+
+			// preload a valid date first encounter
+ 			if($folders_newdate[$tivoarray [$i] ['seriesid']] == "")
+ 				$folders_newdate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
+ 			if($folders_olddate[$tivoarray [$i] ['seriesid']] == "")
+ 				$folders_olddate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
 			
 			// youngest recording
 			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['seriesid']]) {
@@ -605,13 +616,20 @@ foreach($tivos as $tivo) {
 	foreach($groups as $x => $x_value) {	// Procress the entire array
 		$series_count++;
 		// header for each series put in loop to give each table a unique ID from the seriesid
-		fwrite($fp1, "<div><img src=\"" .$images. "checkbox.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
-		fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span> - <span class=\"eptitle\"></span> <a> ( " . $groups_count[$x] . " Episodes ) </a>\n");
-		fwrite($fp1, tivoDate(" F j, Y, g:i a ", $groups_olddate[$x]));
+		fwrite($fp1, "<div><img src=\"" .$images. "folder.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
+		fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span><span class=\"desc\"> (" . $groups_count[$x]);
+		if ($groups_count[$x] > 1) {
+			fwrite($fp1, " episodes; ");
+		}
+		else {
+			fwrite($fp1, " episode; ");
+		}
+		fwrite($fp1, tivoDate("F j, Y, g:i a", $groups_olddate[$x]));
 		if($groups_count[$x] > 1)
-			fwrite($fp1, " --> " . tivoDate("F j, Y, g:i a", $groups_newdate[$x]));
+			fwrite($fp1, " &rarr; " . tivoDate("F j, Y, g:i a", $groups_newdate[$x]));
+		fwrite($fp1, ") </span>");
 		fwrite($fp1, "<div class=\"item\" id=\"myTbody".$series_count."\">\n");
-		fwrite($fp1, "<h4>\n<br><table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
+		fwrite($fp1, "<h4>\n<table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
 		fwrite($fp1, "	<tr>
 					<th> TiVo </th>
 					<th class=\"sorttable\"> Status </th>
@@ -622,7 +640,7 @@ foreach($tivos as $tivo) {
 					<th class=\"sorttable\"> Series ID </th>
 					</tr>\n");
 		fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
-		fwrite($fp1, "</table>\n</h4></div>\n</div>\n<br>");
+		fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
 	}
 
 	fwrite($fp1, $footer);
@@ -823,13 +841,20 @@ fwrite($fp1, $sort_header);
 foreach($folders as $x => $x_value) {	// Procress the entire array
 	$series_count++;
 	// header for each series put in loop to give each table a unique ID from the seriesid
-	fwrite($fp1, "<div><img src=\"" .$images. "checkbox.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
-	fwrite($fp1, "<span class=\"name\">" . $folders_series[$x] . "</span> - <span class=\"eptitle\"></span> <a> ( " . $folders_count[$x] . " Episodes ) </a>\n");
-	fwrite($fp1, tivoDate(" F j, Y, g:i a ", $folders_olddate[$x]));
+	fwrite($fp1, "<div><img src=\"" .$images. "folder.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
+	fwrite($fp1, "<span class=\"name\">" . $folders_series[$x] . "</span><span class=\"desc\"> (" . $folders_count[$x]);
+	if ($folders_count[$x] > 1) {
+		fwrite($fp1, " episodes; ");
+	}
+	else {
+		fwrite($fp1, " episode; ");
+	}
+	fwrite($fp1, tivoDate("F j, Y, g:i a", $folders_olddate[$x]));
 	if($folders_count[$x] > 1)
-		fwrite($fp1, " --> " . tivoDate("F j, Y, g:i a", $folders_newdate[$x]));
+		fwrite($fp1, " &rarr; " . tivoDate("F j, Y, g:i a", $folders_newdate[$x]));
+	fwrite($fp1, ") </span>");
 	fwrite($fp1, "<div class=\"item\" id=\"myTbody".$series_count."\">\n");
-	fwrite($fp1, "<h4>\n<br><table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
+	fwrite($fp1, "<h4>\n<table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
 	fwrite($fp1, "	<tr>
 					<th> TiVo </th>
 					<th class=\"sorttable\"> Status </th>
@@ -840,7 +865,7 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 					<th class=\"sorttable\"> Series ID </th>
 					</tr>\n");
 	fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
-	fwrite($fp1, "</table>\n</h4></div>\n</div>\n<br>");
+	fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
 }
 
 fwrite($fp1, $sort_footer );
