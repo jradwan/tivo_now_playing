@@ -95,8 +95,11 @@
  *  Start of tool-tips using simple html (no formatting)
  *  today just groups episode title (line 489)
  *
+ * 20170623 VicW
+ *  Tool Tip Program ID and Record Date
+ *
 */
-$LASTUPDATE = "20170622";
+$LASTUPDATE = "20170623";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -488,17 +491,25 @@ foreach($tivos as $tivo) {
 
 // XXXXXX First Tool Tip
 			$groups[$tivoarray [$i] ['seriesid']] .=
-				 "<td> <span title=\"" .$tivoarray [$i] ['description'] .
-				 "\">". $tivoarray [$i] ['episodetitle'] . " </span> </td>";
+				 "<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">".	// tooltip
+				 $tivoarray [$i] ['episodetitle'] . " </span> </td>";				// title
 
+// XXXXXX Third Tool Tip
 			$groups[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
 				// record date index on sortable numeric value
 				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .
 				// record date viewable format
-				tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";
+				//tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";
+				"<span title=\"" . mSecsToTime($tivoarray [$i] ['duration']) . " Channel; " . $tivoarray[$i]['sourcestation'] . " (" . $sc[0] . ")\">" .
+						 tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";
 
+// xxxxxx Second Tool Tip
 			// Note: ProgramID and Series are for testing may be removed one or both in the future
-			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
+			//$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
+			$groups[$tivoarray [$i] ['seriesid']] .=
+				 "<td> <span title=\"" . $tivoarray [$i] ['seriesid'] . "\">" .		// tooltip
+				 $tivoarray [$i] ['programid'] . " </span> </td>";					// programid
+
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 
 			// Collect info for the collapsible tables header for ALL DVRs
