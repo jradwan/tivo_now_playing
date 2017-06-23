@@ -101,6 +101,7 @@
  *   Record Date	Channel and Duration
  *   Title with		Series ID
  *   Status Icons	Status description
+ *   TiVo			Title, Model, and Size
  *
  *
 */
@@ -480,7 +481,10 @@ foreach($tivos as $tivo) {
 			// add the TiVo's name for the first field in the sort table
 			$groups[$tivoarray [$i] ['seriesid']] .= "<tr>";
 			// add shows title to sort table
-			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
+// XXXXXX Sixth Tool Tip
+			$groups[$tivoarray [$i] ['seriesid']] .=
+					"<td> <span title=\"" . $tivo ['name'] . "\nModel: " . $tivo ['model'] . "\nSize: " . $tivo ['size_gb'] . " GB\">" .
+			 		$tivo ['shorttitle'] ."</td>";
 
 // XXXXXX Fifth Tool Tip
 			if ($customicon[3] != "") {
