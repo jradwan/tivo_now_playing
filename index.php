@@ -43,7 +43,7 @@
  *
  * 20170527 VicW (TiVoHomeUser)
  *  Moved write for _track_drive_size.log inside the size check block.
- *  Now the log file is only writen to when the computed storage size has changed.
+ *  Now the log file is only written to when the computed storage size has changed.
  *
  * 20170528 VicW
  *  Link to folders from All Suggestions
@@ -91,8 +91,12 @@
  *  Removed the series count from folders/groups easily confused number of episodes
  *  fix for olddate uninitialized null would never test older initialized both old and new JIC
  *
+ * 20170622 VicW
+ *  Start of tool-tips using simple html (no formatting)
+ *  today just groups episode title (line 489)
+ *
 */
-$LASTUPDATE = "20170620";
+$LASTUPDATE = "20170622";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -464,12 +468,12 @@ foreach($tivos as $tivo) {
 				$groups_olddate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
 			}
 			// End collect info for the collapsible tables header
-			
+
 			// add the TiVo's name for the first field in the sort table
 			$groups[$tivoarray [$i] ['seriesid']] .= "<tr>";
 			// add shows title to sort table
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
-				
+
 			if ($customicon[3] != "") {
 				$groups[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
 						$customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
@@ -478,9 +482,15 @@ foreach($tivos as $tivo) {
 				$groups[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
 						"regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
+
 			// add shows title to sort table
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
-			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
+
+// XXXXXX First Tool Tip
+			$groups[$tivoarray [$i] ['seriesid']] .=
+				 "<td> <span title=\"" .$tivoarray [$i] ['description'] .
+				 "\">". $tivoarray [$i] ['episodetitle'] . " </span> </td>";
+
 			$groups[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
 				// record date index on sortable numeric value
 				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .
@@ -501,7 +511,7 @@ foreach($tivos as $tivo) {
  				$folders_newdate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
  			if($folders_olddate[$tivoarray [$i] ['seriesid']] == "")
  				$folders_olddate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
-			
+
 			// youngest recording
 			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['seriesid']]) {
 				$folders_newdate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
@@ -511,12 +521,12 @@ foreach($tivos as $tivo) {
 				$folders_olddate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
 			}
 			// End collect info for the collapsible tables header for ALL DVRs
-					
+
 			// add the TiVo's name for the first field in the sort table
 			$folders[$tivoarray [$i] ['seriesid']] .= "<tr>";
 			// add show's title to sort table
 			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
-			
+
 			if ($customicon[3] != "") {
 				$folders[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
 				 $customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
