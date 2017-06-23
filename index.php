@@ -93,10 +93,15 @@
  *
  * 20170622 VicW
  *  Start of tool-tips using simple html (no formatting)
- *  today just groups episode title (line 489)
  *
  * 20170623 VicW
- *  Tool Tip Program ID and Record Date
+ *  Tool Tips for Groups
+ *   Episode title	Episode Description
+ *   Program ID		Series ID
+ *   Record Date	Channel and Duration
+ *   Title with		Series ID
+ *   Status Icons	Status description
+ *
  *
 */
 $LASTUPDATE = "20170623";
@@ -477,38 +482,46 @@ foreach($tivos as $tivo) {
 			// add shows title to sort table
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
 
+// XXXXXX Fifth Tool Tip
 			if ($customicon[3] != "") {
-				$groups[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
+				$groups[$tivoarray [$i] ['seriesid']] .=
+						"<td> <span title=\"" . $customicon[3] . "\">".
+						"<center><img src=\"" .$images. "" .
 						$customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 			else {
-				$groups[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
+				$groups[$tivoarray [$i] ['seriesid']] .=
+						"<td> <span title=\"regular-recording" . "\">".
+						"<center><img src=\"" .$images. "" .
 						"regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 
 			// add shows title to sort table
-			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
+// XXXXXX Forth Tool Tip
+			$groups[$tivoarray [$i] ['seriesid']] .=
+					"<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .		// tooltip
+					$tivoarray [$i] ['title'] ."</td>";									// title
 
 // XXXXXX First Tool Tip
 			$groups[$tivoarray [$i] ['seriesid']] .=
-				 "<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">".	// tooltip
-				 $tivoarray [$i] ['episodetitle'] . " </span> </td>";				// title
+				 "<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">".		// tooltip
+				 $tivoarray [$i] ['episodetitle'] . " </span> </td>";					// episode title
 
 // XXXXXX Third Tool Tip
 			$groups[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
 				// record date index on sortable numeric value
-				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .
+				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .			// Sort value
 				// record date viewable format
-				//tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";
-				"<span title=\"" . mSecsToTime($tivoarray [$i] ['duration']) . " Channel; " . $tivoarray[$i]['sourcestation'] . " (" . $sc[0] . ")\">" .
-						 tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";
+				"<span title=\"Channel: " . $tivoarray[$i]['sourcestation'] . " (" . $sc[0] . ")" .
+				"\nDuration: " . mSecsToTime($tivoarray [$i] ['duration']) . "\">" .					// tooltip Channel and Duration
+				 tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";	// Date
 
-// xxxxxx Second Tool Tip
+// XXXXXX Second Tool Tip
 			// Note: ProgramID and Series are for testing may be removed one or both in the future
 			//$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
 			$groups[$tivoarray [$i] ['seriesid']] .=
-				 "<td> <span title=\"" . $tivoarray [$i] ['seriesid'] . "\">" .		// tooltip
-				 $tivoarray [$i] ['programid'] . " </span> </td>";					// programid
+				 "<td> <span title=\"" . $tivoarray [$i] ['seriesid'] . "\">" .			// tooltip
+				 $tivoarray [$i] ['programid'] . " </span> </td>";						// programid
 
 			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 
