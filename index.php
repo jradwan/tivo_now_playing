@@ -102,6 +102,9 @@
  *   Title with		Series ID
  *   Status Icons	Status description
  *   TiVo			Title, Model, and Size
+ *   removed SeriesID from table
+ *   Check for empty SeriesID labeled table as "Movies and Specials" (Yellow Highlighted)
+ *   Modified Folders to match Groups
  *
  *
 */
@@ -481,12 +484,12 @@ foreach($tivos as $tivo) {
 			// add the TiVo's name for the first field in the sort table
 			$groups[$tivoarray [$i] ['seriesid']] .= "<tr>";
 			// add shows title to sort table
-// XXXXXX Sixth Tool Tip
+// 1 XXXXXX Tool Tip
 			$groups[$tivoarray [$i] ['seriesid']] .=
 					"<td> <span title=\"" . $tivo ['name'] . "\nModel: " . $tivo ['model'] . "\nSize: " . $tivo ['size_gb'] . " GB\">" .
 			 		$tivo ['shorttitle'] ."</td>";
 
-// XXXXXX Fifth Tool Tip
+// 2 XXXXXX Tool Tip
 			if ($customicon[3] != "") {
 				$groups[$tivoarray [$i] ['seriesid']] .=
 						"<td> <span title=\"" . $customicon[3] . "\">".
@@ -501,17 +504,21 @@ foreach($tivos as $tivo) {
 			}
 
 			// add shows title to sort table
-// XXXXXX Forth Tool Tip
+// 3 XXXXXX Tool Tip
 			$groups[$tivoarray [$i] ['seriesid']] .=
 					"<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .		// tooltip
 					$tivoarray [$i] ['title'] ."</td>";									// title
 
-// XXXXXX First Tool Tip
+// 4 XXXXXX Tool Tip
 			$groups[$tivoarray [$i] ['seriesid']] .=
-				 "<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">".		// tooltip
-				 $tivoarray [$i] ['episodetitle'] . " </span> </td>";					// episode title
+				 "<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">";		// tooltip
+			if($tivoarray [$i] ['episodetitle'] == ""){ 								// No episode title for Movies and Specials
+				$groups[$tivoarray [$i] ['seriesid']] .= "<center> - </span> </td>";	// still want the ToolTip
+			} else {
+				 $groups[$tivoarray [$i] ['seriesid']] .= $tivoarray [$i] ['episodetitle'] . " </span> </td>";	// episode title
+			}
 
-// XXXXXX Third Tool Tip
+// 5 XXXXXX Tool Tip
 			$groups[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
 				// record date index on sortable numeric value
 				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .			// Sort value
@@ -520,14 +527,15 @@ foreach($tivos as $tivo) {
 				"\nDuration: " . mSecsToTime($tivoarray [$i] ['duration']) . "\">" .					// tooltip Channel and Duration
 				 tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";	// Date
 
-// XXXXXX Second Tool Tip
+// 6 XXXXXX Tool Tip
 			// Note: ProgramID and Series are for testing may be removed one or both in the future
 			//$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
 			$groups[$tivoarray [$i] ['seriesid']] .=
-				 "<td> <span title=\"" . $tivoarray [$i] ['seriesid'] . "\">" .			// tooltip
+				 "<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .			// tooltip
 				 $tivoarray [$i] ['programid'] . " </span> </td>";						// programid
 
-			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
+			// Removed Series ID from table
+			//$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 
 			// Collect info for the collapsible tables header for ALL DVRs
 			// save the series name and count the episodes (a multidimensional array would be better)
@@ -553,29 +561,77 @@ foreach($tivos as $tivo) {
 			// add the TiVo's name for the first field in the sort table
 			$folders[$tivoarray [$i] ['seriesid']] .= "<tr>";
 			// add show's title to sort table
-			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
 
+// 1 XXXXXXXX Tool Tip
+			$folders[$tivoarray [$i] ['seriesid']] .=
+			"<td> <span title=\"" . $tivo ['name'] . "\nModel: " . $tivo ['model'] . "\nSize: " . $tivo ['size_gb'] . " GB\">" .
+			$tivo ['shorttitle'] ."</td>";
+//			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
+
+
+// 2 XXXXXXXX Tool Tip
 			if ($customicon[3] != "") {
-				$folders[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
-				 $customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
+				$folders[$tivoarray [$i] ['seriesid']] .=
+				"<td> <span title=\"" . $customicon[3] . "\">".
+				"<center><img src=\"" .$images. "" .
+				$customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 			else {
-				$folders[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
-				 "regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
+				$folders[$tivoarray [$i] ['seriesid']] .=
+				"<td> <span title=\"regular-recording" . "\">".
+				"<center><img src=\"" .$images. "" .
+				"regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
 			}
 
-			// add show's title to sort table
-			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
-			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
-			$folders[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
-				// record date index on sortable numeric value
-				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .
-				// record date viewable format
-				tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";
+// 			if ($customicon[3] != "") {
+// 				$folders[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
+// 				 $customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
+// 			}
+// 			else {
+// 				$folders[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
+// 				 "regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
+// 			}
 
+			// add show's title to sort table
+// 3 XXXXXXXX Tool Tip
+			$folders[$tivoarray [$i] ['seriesid']] .=
+			"<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .		// tooltip
+			$tivoarray [$i] ['title'] ."</td>";									// title
+//			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
+
+// 4 XXXXXXXX Tool Tip
+			$folders[$tivoarray [$i] ['seriesid']] .=
+			"<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">";			// tooltip
+			if($tivoarray [$i] ['episodetitle'] == ""){ 								// No episode title for Movies and Specials
+				$folders[$tivoarray [$i] ['seriesid']] .= "<center> - </span> </td>";	// still want the ToolTip
+			} else {
+				$folders[$tivoarray [$i] ['seriesid']] .= $tivoarray [$i] ['episodetitle'] . " </span> </td>";	// episode title
+			}
+//			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
+
+// 5 XXXXXXXX Tool Tip
+			$folders[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
+					// record date index on sortable numeric value
+			tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .			// Sort value
+			// record date viewable format
+			"<span title=\"Channel: " . $tivoarray[$i]['sourcestation'] . " (" . $sc[0] . ")" .
+			"\nDuration: " . mSecsToTime($tivoarray [$i] ['duration']) . "\">" .					// tooltip Channel and Duration
+			tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";	// Date
+//			$folders[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
+//				// record date index on sortable numeric value
+//				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .
+//				// record date viewable format
+//				tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";
+
+// 6 XXXXXXXX Tool Tip
 			// Note: ProgramID and Series are for testing may be removed one or both in the future
-			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
-			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
+			$folders[$tivoarray [$i] ['seriesid']] .=
+				 "<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .			// tooltip
+				 $tivoarray [$i] ['programid'] . " </span> </td>";						// programid
+//			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
+
+			// Removed SeriesID from table
+			//$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 
 		} // loop through tivoarray
 	} // if tivoarray is not null
@@ -655,7 +711,14 @@ foreach($tivos as $tivo) {
 		$series_count++;
 		// header for each series put in loop to give each table a unique ID from the seriesid
 		fwrite($fp1, "<div><img src=\"" .$images. "folder.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
-		fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span><span class=\"desc\"> (" . $groups_count[$x]);
+
+		// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
+		if($x == ""){
+			fwrite($fp1, "<span class=\"name\" > <mark><i><b>" . "Movies and Specials" . "</b></i></mark></span><span class=\"desc\"> (" . $groups_count[$x]);
+		} else {
+			fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span><span class=\"desc\"> (" . $groups_count[$x]);
+		}
+
 		if ($groups_count[$x] > 1) {
 			fwrite($fp1, " episodes; ");
 		}
@@ -675,8 +738,19 @@ foreach($tivos as $tivo) {
 					<th class=\"sorttable\"> Episode </th>
 					<th class=\"sorttable_numeric\"> Record Date </th>
 					<th class=\"sorttable\"> Program ID </th>
-					<th class=\"sorttable\"> Series ID </th>
 					</tr>\n");
+
+/*	Removed SeriesID from table
+ * 		fwrite($fp1, "	<tr>
+ *					<th> TiVo </th>
+ *					<th class=\"sorttable\"> Status </th>
+ *					<th class=\"sorttable\"> Series Name </th>
+ *					<th class=\"sorttable\"> Episode </th>
+ *					<th class=\"sorttable_numeric\"> Record Date </th>
+ *					<th class=\"sorttable\"> Program ID </th>
+ *					<th class=\"sorttable\"> Series ID </th>
+ *					</tr>\n");
+ */
 		fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
 		fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
 	}
@@ -880,7 +954,13 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 	$series_count++;
 	// header for each series put in loop to give each table a unique ID from the seriesid
 	fwrite($fp1, "<div><img src=\"" .$images. "folder.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
-	fwrite($fp1, "<span class=\"name\">" . $folders_series[$x] . "</span><span class=\"desc\"> (" . $folders_count[$x]);
+	// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
+ 	if($x == ""){
+  		fwrite($fp1, "<span class=\"name\" > <mark><i><b>" . "Movies and Specials" . "</b></i></mark></span><span class=\"desc\"> (" . $folders_count[$x]);
+ 	} else {
+ 		fwrite($fp1, "<span class=\"name\">" . $folders_series[$x] . "</span><span class=\"desc\"> (" . $folders_count[$x]);
+  	}
+
 	if ($folders_count[$x] > 1) {
 		fwrite($fp1, " episodes; ");
 	}
@@ -900,8 +980,19 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 					<th class=\"sorttable\"> Episode </th>
 					<th class=\"sorttable_numeric\"> Record Date </th>
 					<th class=\"sorttable\"> Program ID </th>
-					<th class=\"sorttable\"> Series ID </th>
 					</tr>\n");
+/*	B4 Removing Series ID
+ * 	fwrite($fp1, "	<tr>
+ *					<th> TiVo </th>
+ *					<th class=\"sorttable\"> Status </th>
+ *					<th class=\"sorttable\"> Series Name </th>
+ *					<th class=\"sorttable\"> Episode </th>
+ *					<th class=\"sorttable_numeric\"> Record Date </th>
+ *					<th class=\"sorttable\"> Program ID </th>
+ *					<th class=\"sorttable\"> Series ID </th>
+ *					</tr>\n");
+ *
+ */
 	fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
 	fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
 }
