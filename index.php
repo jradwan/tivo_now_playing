@@ -107,9 +107,12 @@
  *   Modified Folders to match Groups
  *   replaced folders $sort_footer with $allfooter to include totals
  *
+ * 20170624 VicW
+ * 	The re-used headers expand/collapse all starts toggling with id 0
+ *  rather then modify the 2 headers $series_count++ was moved to end of loop
  *
 */
-$LASTUPDATE = "20170623";
+$LASTUPDATE = "20170624";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -709,7 +712,7 @@ foreach($tivos as $tivo) {
 	$fp1 = @fopen($nowPlayingGroups, "w");
 	fwrite($fp1, $header . "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n");
 	foreach($groups as $x => $x_value) {	// Procress the entire array
-		$series_count++;
+		//$series_count++; toggleALL in $header is set to start toggeling at myTbody0 it won't work if myTbody* starts at 1
 		// header for each series put in loop to give each table a unique ID from the seriesid
 		fwrite($fp1, "<div><img src=\"" .$images. "folder.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
 
@@ -754,6 +757,7 @@ foreach($tivos as $tivo) {
  */
 		fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
 		fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
+$series_count++;
 	}
 
 	fwrite($fp1, $footer);
@@ -952,7 +956,7 @@ $fp1 = @fopen($foldershtm, "w");
 fwrite($fp1, $sort_header);
 
 foreach($folders as $x => $x_value) {	// Procress the entire array
-	$series_count++;
+	//$series_count++; toggleALL in $sort_header is set to start toggeling at myTbody0 it won't work if myTbody* starts at 1
 	// header for each series put in loop to give each table a unique ID from the seriesid
 	fwrite($fp1, "<div><img src=\"" .$images. "folder.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
 	// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
@@ -996,6 +1000,7 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
  */
 	fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
 	fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
+	$series_count++;
 }
 fwrite($fp1, $allfooter);
 //fwrite($fp1, $sort_footer );
