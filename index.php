@@ -105,6 +105,7 @@
  *   removed SeriesID from table
  *   Check for empty SeriesID labeled table as "Movies and Specials" (Yellow Highlighted)
  *   Modified Folders to match Groups
+ *   replaced folders $sort_footer with $allfooter to include totals
  *
  *
 */
@@ -996,9 +997,9 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 	fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
 	fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
 }
-
-fwrite($fp1, $sort_footer );
-fwrite($fp1, "</body></html>");
+fwrite($fp1, $allfooter);
+//fwrite($fp1, $sort_footer );
+//fwrite($fp1, "</body></html>");
 fclose ( $fp1 );
 
 ?>
