@@ -175,6 +175,9 @@ $icnt = 0; // make a unique ID to enable toggle on page with all TiVos
 
 // make a header for the summary page
 $sum_header .= "<!DOCTYPE html>\n";
+
+//$sum_header .= "\nHello from SUM_HEADER $icnt \n";
+
 $sum_header .= "<html><head>\n";
 $sum_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 $sum_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
@@ -202,6 +205,9 @@ $sum_table .= "</tr>\n";
 
 // header for full list of programs from all TiVos
 $allheader .= "<!DOCTYPE html\n>";
+
+//$allheader .= "\nHello from ALLHEADER $icnt\n";
+
 $allheader .= "<html><head>\n";
 $allheader .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html charset=UTF-8\">\n";
 $allheader .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
@@ -227,6 +233,9 @@ $allcontent = "";
 
 // header for sortable episodes page
 $sort_header .= "<!DOCTYPE html>\n";
+
+//$sort_header .= "\nHello from SORT_HEADER $icnt\n";
+
 $sort_header .= "<html><head>\n";
 $sort_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 $sort_header .= "<LINK REL=\"shortcut icon\" HREF=\"" . $images . "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
@@ -264,7 +273,7 @@ foreach($tivos as $tivo) {
 			 $content, $footer, $fp1, $fp2, $totalsuggestions, $totalnumsuggestions, $percent_free, $fpt, $auto_size_gb, $recording_suggestion,
 			 $sug_header, $sug_table, $sug_footer, $sug_html_file, $sug_log_file, $sug_html_file, $archNowPlaying, $nowPlaying,
 			 $groups, $groups_series, $groups_count, $groups_newdate, $groups_olddate);
-
+	$icnt=0; // TEMPOARY FIX FOR NOW
 
 	// collect the data for the TiVo
 	$tivoxml = new Tivo_XML();
@@ -318,6 +327,7 @@ foreach($tivos as $tivo) {
 	}
 
 	$header .= "<!DOCTYPE html>\n";
+//	$header .= "\nHello from HEADER $icnt\n";
 	$header .= "<html><head>\n";
 	$header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 	$header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
