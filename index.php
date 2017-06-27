@@ -123,8 +123,14 @@
  *  * ALLHEADER						Alldvrs						sequential starts at 0
  *
  *	* Can be defined before loop
+ *
+ * 20170626
+ *  Cleanup of the majority of the HTML errors
+ *  Addition of tool-tip episode summary to sort
+ *  TODO add sort tool-tip for time
+ *
 */
-$LASTUPDATE = "20170625";
+$LASTUPDATE = "20170626";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -409,7 +415,7 @@ foreach($tivos as $tivo) {
 
 			// for debugging tool tip displays the $icnt value
 			//$content .= "<img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\">\n";
-			$content .= "<span title= \" Expand:( " . $icnt . ")\"> <img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\">\n";
+			$content .= "<span title= \" Expand:( " . $icnt . ")\"> <img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\"></span>\n";
 
 			if ($customicon[3] != "") {
 				$content .= "<img src=\"" .$images. "" . $customicon[3] . ".png\" width=\"16\" height=\"16\">\n";
@@ -491,9 +497,17 @@ foreach($tivos as $tivo) {
                		// add a row to the sortable table (sortable episode list)
 			$sort_table .= "<tr>";
 			$sort_table .= "<td>" . $tivo ['name'] ."</td>";
-			$sort_table .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
+			//$sort_table .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
 			$sort_table .= "<td> <span class=\"name\" title=\"" . $tivo['nowplaying'] . "\">" . $tivoarray[$i]['title'] . "</span></td>";
-			$sort_table .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
+
+//			$sort_table .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
+			$sort_table .= "<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">";		// tooltip
+			if($tivoarray [$i] ['episodetitle'] == ""){ 								// No episode title for Movies and Specials
+				$sort_table .= "<center> - </center></span> </td>";	// still want the ToolTip
+			} else {
+				$sort_table .= $tivoarray [$i] ['episodetitle'] . " </span> </td>";	// episode title
+			}
+
 			$sort_table .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
 			$sort_table .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 			$sort_table .= "<td sorttable_customkey=\"" . tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) .
@@ -527,33 +541,33 @@ foreach($tivos as $tivo) {
 // 1 XXXXXX Tool Tip
 			$groups[$tivoarray [$i] ['seriesid']] .=
 					"<td> <span title=\"" . $tivo ['name'] . "\nModel: " . $tivo ['model'] . "\nSize: " . $tivo ['size_gb'] . " GB\">" .
-			 		$tivo ['shorttitle'] ."</td>";
+			 		$tivo ['shorttitle'] .",</span></td>";
 
 // 2 XXXXXX Tool Tip
 			if ($customicon[3] != "") {
 				$groups[$tivoarray [$i] ['seriesid']] .=
 						"<td> <span title=\"" . $customicon[3] . "\">".
-						"<center><img src=\"" .$images. "" .
-						$customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
+						"<center><img src=\"" .$images.
+						$customicon[3] . ".png\" width=\"16\" height=\"16\"></center></span></td>\n";
 			}
 			else {
 				$groups[$tivoarray [$i] ['seriesid']] .=
 						"<td> <span title=\"regular-recording" . "\">".
-						"<center><img src=\"" .$images. "" .
-						"regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
+						"<center><img src=\"" .$images.
+						"regular-recording.png\" width=\"16\" height=\"16\"></center></span></td>\n";
 			}
 
 			// add shows title to sort table
 // 3 XXXXXX Tool Tip
 			$groups[$tivoarray [$i] ['seriesid']] .=
 					"<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .		// tooltip
-					$tivoarray [$i] ['title'] ."</td>";									// title
+					$tivoarray [$i] ['title'] ."</span></td>";									// title
 
 // 4 XXXXXX Tool Tip
 			$groups[$tivoarray [$i] ['seriesid']] .=
 				 "<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">";		// tooltip
 			if($tivoarray [$i] ['episodetitle'] == ""){ 								// No episode title for Movies and Specials
-				$groups[$tivoarray [$i] ['seriesid']] .= "<center> - </span> </td>";	// still want the ToolTip
+				$groups[$tivoarray [$i] ['seriesid']] .= "<center> - </center></span> </td>";	// still want the ToolTip
 			} else {
 				 $groups[$tivoarray [$i] ['seriesid']] .= $tivoarray [$i] ['episodetitle'] . " </span> </td>";	// episode title
 			}
@@ -565,7 +579,7 @@ foreach($tivos as $tivo) {
 				// record date viewable format
 				"<span title=\"Channel: " . $tivoarray[$i]['sourcestation'] . " (" . $sc[0] . ")" .
 				"\nDuration: " . mSecsToTime($tivoarray [$i] ['duration']) . "\">" .					// tooltip Channel and Duration
-				 tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";	// Date
+				 tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</span></td>";	// Date
 
 // 6 XXXXXX Tool Tip
 			// Note: ProgramID and Series are for testing may be removed one or both in the future
@@ -605,7 +619,7 @@ foreach($tivos as $tivo) {
 // 1 XXXXXXXX Tool Tip
 			$folders[$tivoarray [$i] ['seriesid']] .=
 			"<td> <span title=\"" . $tivo ['name'] . "\nModel: " . $tivo ['model'] . "\nSize: " . $tivo ['size_gb'] . " GB\">" .
-			$tivo ['shorttitle'] ."</td>";
+			$tivo ['shorttitle'] ."</span></td>";
 //			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
 
 
@@ -614,13 +628,13 @@ foreach($tivos as $tivo) {
 				$folders[$tivoarray [$i] ['seriesid']] .=
 				"<td> <span title=\"" . $customicon[3] . "\">".
 				"<center><img src=\"" .$images. "" .
-				$customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
+				$customicon[3] . ".png\" width=\"16\" height=\"16\"></center></span></td>\n";
 			}
 			else {
 				$folders[$tivoarray [$i] ['seriesid']] .=
 				"<td> <span title=\"regular-recording" . "\">".
 				"<center><img src=\"" .$images. "" .
-				"regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
+				"regular-recording.png\" width=\"16\" height=\"16\"></center></span></td>\n";
 			}
 
 // 			if ($customicon[3] != "") {
@@ -636,14 +650,14 @@ foreach($tivos as $tivo) {
 // 3 XXXXXXXX Tool Tip
 			$folders[$tivoarray [$i] ['seriesid']] .=
 			"<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .		// tooltip
-			$tivoarray [$i] ['title'] ."</td>";									// title
+			$tivoarray [$i] ['title'] ."</span></td>";									// title
 //			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
 
 // 4 XXXXXXXX Tool Tip
 			$folders[$tivoarray [$i] ['seriesid']] .=
 			"<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">";			// tooltip
 			if($tivoarray [$i] ['episodetitle'] == ""){ 								// No episode title for Movies and Specials
-				$folders[$tivoarray [$i] ['seriesid']] .= "<center> - </span> </td>";	// still want the ToolTip
+				$folders[$tivoarray [$i] ['seriesid']] .= "<center> - </center></span> </td>";	// still want the ToolTip
 			} else {
 				$folders[$tivoarray [$i] ['seriesid']] .= $tivoarray [$i] ['episodetitle'] . " </span> </td>";	// episode title
 			}
@@ -656,7 +670,7 @@ foreach($tivos as $tivo) {
 			// record date viewable format
 			"<span title=\"Channel: " . $tivoarray[$i]['sourcestation'] . " (" . $sc[0] . ")" .
 			"\nDuration: " . mSecsToTime($tivoarray [$i] ['duration']) . "\">" .					// tooltip Channel and Duration
-			tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";	// Date
+			tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</span></td>";	// Date
 //			$folders[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
 //				// record date index on sortable numeric value
 //				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .
@@ -822,7 +836,7 @@ foreach($tivos as $tivo) {
 			// make a header for the summary of suggestions page
 			$sug_header .= "<!DOCTYPE html>\n";
 			// Debugging code
-			$sug_header .= "/n<!-- Hello from SUG_HEADER $icnt -->\n";
+			$sug_header .= "\n<!-- Hello from SUG_HEADER $icnt -->\n";
 			$sug_header .= "<html><head>\n";
 			$sug_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 			$sug_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
