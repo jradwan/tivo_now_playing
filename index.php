@@ -428,7 +428,7 @@ foreach($tivos as $tivo) {
 
 			// for debugging tool tip displays the $icnt value
 			//$content .= "<img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\">\n";
-			$content .= "<span title= \" Expand:( " . $icnt . ")\"> <img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"check box\" ></span>\n";
+			$content .= "<span title= \" Expand:" . $icnt . "\"> <img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"check box\" ></span>\n";
 
 			if ($customicon[3] != "") {
 				$content .= "<img src=\"" .$images. "" . $customicon[3] . ".png\" width=\"16\" height=\"16\" alt=\"".$customicon[3]."\">\n";
@@ -439,7 +439,7 @@ foreach($tivos as $tivo) {
 
 			if ($imdblinks == 1) {
 				$imdb = str_replace(" ", "%20", $tivoarray[$i]['title']);
-				$content .= "<a href=\"http://www.imdb.com/find?q=" . $imdb . ";tt=on;nm=on;mx=20\" target=\"_blank\"><img src=\"" .$images. "imdb.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"i m b d\"></a>\n";
+				$content .= "<a href=\"http://www.imdb.com/find?q=" . $imdb . ";tt=on;nm=on;mx=20\" target=\"_blank\"><img src=\"" .$images. "imdb.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"i m d b\"></a>\n";
 			}
 
 			if ($disablexmllinks == 0){
@@ -533,7 +533,7 @@ foreach($tivos as $tivo) {
 			$groups_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];
 			$groups_count[$tivoarray [$i] ['seriesid']]++;
 
-			// preload a valid date first encounter otherwize date checks get messed up
+			// preload a valid date first encounter otherwise date checks get messed up
 			if($groups_newdate[$tivoarray [$i] ['seriesid']] == "")
  				$groups_newdate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
  			if($groups_olddate[$tivoarray [$i] ['seriesid']] == "")
@@ -556,7 +556,7 @@ foreach($tivos as $tivo) {
 			// Tool Tip for TiVo name in Groups
 			$groups[$tivoarray [$i] ['seriesid']] .=
 					"\n<td> <span title=\"" . $tivo ['name'] . "\nModel: " . $tivo ['model'] . "\nSize: " . $tivo ['size_gb'] . " GB\">" .
-			 		$tivo ['shorttitle'] .",</span></td>";
+			 		$tivo ['shorttitle'] ."</span></td>";
 
 			// Tool Tip for status icon in Groups
 			if ($customicon[3] != "") {
@@ -759,7 +759,7 @@ foreach($tivos as $tivo) {
 	$fp1 = @fopen($nowPlayingGroups, "w");
 	fwrite($fp1, $header . "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n");
 	foreach($groups as $x => $x_value) {	// Procress the entire array
-		  fwrite($fp1, "<div><span title= \" Expand: " . $icnt . "\"> " .
+		  fwrite($fp1, "<div><span title= \" Expand: " . $series_count . "\"> " .
 		               "<img src=\"" . $images . "folder.png\" id=\"plusminus" . $series_count . "\" onclick=\"toggleItem(" . $series_count . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"folder\"></span>\n");
 
 		// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
@@ -889,7 +889,7 @@ foreach($tivos as $tivo) {
 		$allcontent .= "<h1> <img src=\"" .$images. "tivo_" . $tivo['model'] . ".png\"><br>" . $tivo['nowplaying'] . " </h1>\n";
 	} else {
 		print("Missing model image: " . "$image_path". "tivo_" . $tivo['model'] . ".png\n");
-	 	$allcontent .= "<h1> <img src=" .$images. "tivo_logo.png alt=\"TiVo\" alt=\"TiVo\" ><br> " . $tivo['nowplaying'] . " </h1>\n";
+	 	$allcontent .= "<h1> <img src=" .$images. "tivo_logo.png alt=\"TiVo\" ><br> " . $tivo['nowplaying'] . " </h1>\n";
 	}
 	//TODO alternate colors for each TiVo or some way to label which box the program is on
 	$allcontent .= $content;	// add content to list of all recordings web page
@@ -912,7 +912,7 @@ $sum_table .= "<tr> "; // start of new row in the table for summary page data
 
 $sum_table .= "<td style=\"text-align:justify\">";
 $sum_table .= " <a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "<img src=\"" .$images. "" . "folder.png\" width=\"16\" height=\"16\" alt=\"folder\">" . "</a>";
-$sum_table .= " <a href=" . $nowPlaying . " title=\"'s Now Playing\">" .  "ALL" . "</a> ";
+$sum_table .= " <a href=" . $nowPlaying . " title=\"ALL Now Playing\">" .  "ALL" . "</a> ";
 $sum_table .= "</td>";
 
 $sum_table .= "<td>" . $all_size_gb . " GB</td> ";
