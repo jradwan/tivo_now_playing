@@ -43,7 +43,7 @@
  *
  * 20170527 VicW (TiVoHomeUser)
  *  Moved write for _track_drive_size.log inside the size check block.
- *  Now the log file is only writen to when the computed storage size has changed.
+ *  Now the log file is only written to when the computed storage size has changed.
  *
  * 20170528 VicW
  *  Link to folders from All Suggestions
@@ -91,8 +91,58 @@
  *  Removed the series count from folders/groups easily confused number of episodes
  *  fix for olddate uninitialized null would never test older initialized both old and new JIC
  *
+ * 20170622 VicW
+ *  Start of tool-tips using simple html (no formatting)
+ *
+ * 20170623 VicW
+ *  Tool Tips for Groups
+ *   Episode title	Episode Description
+ *   Program ID		Series ID
+ *   Record Date	Channel and Duration
+ *   Title with		Series ID
+ *   Status Icons	Status description
+ *   TiVo			Title, Model, and Size
+ *   removed SeriesID from table
+ *   Check for empty SeriesID labeled table as "Movies and Specials" (Yellow Highlighted)
+ *   Modified Folders to match Groups
+ *   replaced folders $sort_footer with $allfooter to include totals
+ *
+ * 20170624 VicW
+ * 	The re-used headers expand/collapse all starts toggling with id 0
+ *  rather then modify the 2 headers $series_count++ was moved to end of loop
+ *
+ * 20170625 VicW
+ *  Restored the tool-tip to display the TiVo's short name on title in ALL
+ *  helps in long lists to know which DVR the program is from.
+ *
+ *  No more sharing of headers each page/group gets it's own.
+ *  * SUM_HEADER		Main 		Summary page				$icnt not needed
+ *  - HEADER			Each DVR	Now Playing,	Group
+ *  * SORT_HEADER1		ALL			Folders						Has it's own count
+ *  * SORT_HEADER					Sort						Not expandable should have it's own without expand all
+ *  * ALLHEADER						Alldvrs						sequential starts at 0
+ *
+ *	* Can be defined before loop
+ *
+ * 20170626 VicW
+ *  Cleanup of the majority of the HTML errors
+ *  Addition of tool-tip episode summary to sort
+ *  TODO add sort tool-tip for time
+ *
+ * 20170627	VicW
+ *  I think all HTML errors are fixed
+ *  last was missing closing tag in the write loop for groups
+ *
+ * 20170628
+ *  added required alt text to <img= tag
+ *
+ *  TODO
+ *  {text-align:center;}
+ *  Problem with <H4> tag before table
+ *
+ *
 */
-$LASTUPDATE = "20170620";
+$LASTUPDATE = "20170630";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -155,6 +205,8 @@ $icnt = 0; // make a unique ID to enable toggle on page with all TiVos
 
 // make a header for the summary page
 $sum_header .= "<!DOCTYPE html>\n";
+// Debugging code
+$sum_header .= "\n<!-- Hello from SUM_HEADER $icnt -->\n";
 $sum_header .= "<html><head>\n";
 $sum_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 $sum_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
@@ -163,11 +215,13 @@ $sum_header .= "<title>TiVo Disk Space - Summary</title>
     <link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\">";
 $sum_header .= "\n</head>\n<body>\n";
 
-$sum_header .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
+$sum_header .= "<h2><img src=images/tivo_logo.png alt=\"TiVo\" ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 $sum_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n";
 
 // start of sortable summary table
-$sum_table .= "<h4>\n<br><table id=\"Summary\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n";
+//$sum_table .= "<h4>\n<br><table id=\"Summary\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n";
+// <h4> cannot be b4 table
+$sum_table .= "\n<h4>\n<br><table id=\"Summary\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n";
 $sum_table .= " <tr>
 		<th> TiVo </th>
 		<th class=\"sorttable_numeric\"> Drive Size </th>
@@ -182,6 +236,9 @@ $sum_table .= "</tr>\n";
 
 // header for full list of programs from all TiVos
 $allheader .= "<!DOCTYPE html\n>";
+// Debugging code
+$allheader .= "\n<!-- Hello from ALLHEADER $icnt-->\n";
+
 $allheader .= "<html><head>\n";
 $allheader .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html charset=UTF-8\">\n";
 $allheader .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
@@ -190,14 +247,13 @@ $allheader .= "<body onload=\"init()\">\n";
 
 // link back to Summary page at top
 $allheader .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" >&larr;&thinsp; back to Summary </a></div>\n";
-
 $allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
 $allheader .= "<div class=\"dura\"><a href=\"" . $myurl. "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
 
-// link to expand/collapse all entries on the page
+// link to expand/collapse all entries on the page $icnt should start at 0 each DVR gets increasingly larger $icnt
 $allheader .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
 
-$allheader .= "<h2><img src=images/tivo_logo.png ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
+$allheader .= "<h2><img src=images/tivo_logo.png  alt=\"TiVo\"><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 
 // include javascript tivo_now_playing.js
 $allheader .= "<script id=\"imagepath\"> \"" . $images . "\" </script>\n";
@@ -207,6 +263,10 @@ $allcontent = "";
 
 // header for sortable episodes page
 $sort_header .= "<!DOCTYPE html>\n";
+
+// Debugging code
+$sort_header .= "\n<!-- Hello from SORT_HEADER $icnt -->\n";
+
 $sort_header .= "<html><head>\n";
 $sort_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 $sort_header .= "<LINK REL=\"shortcut icon\" HREF=\"" . $images . "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
@@ -219,13 +279,20 @@ $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "alldvrs.htm\" >&lar
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "sort.htm\" >&#8645;&nbsp; sortable episode list </a></div>\n";
 $sort_header .= "<div class=\"dura\"><a href=\"" . $myurl . "folders.htm\" >&#8645;&nbsp; sortable episode list (grouped) </a></div>\n";
 
-// link to expand/collapse all entries on the page
-$sort_header .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
+$sort_header1 .= $sort_header;
 
-$sort_header .= "<h1><img src=images/tivo_logo.png > <br> All Now Playing</h1>\n <h2>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
+// link to expand/collapse all entries on the page
+$sort_header1 .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
+
+$sort_header .= "<h1><img src=images/tivo_logo.png  alt=\"TiVo\"> <br> All Now Playing</h1>\n <h2>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 $sort_header .= "<script id=\"imagepath\"> \"" . $images . "\" </script>\n";
 $sort_header .= "<script src=\"" . $mytjs . "\" > </script>\n";
 $sort_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n";
+
+$sort_header1 .= "<h1><img src=images/tivo_logo.png alt=\"TiVo\" > <br> All Now Playing</h1>\n <h2>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
+$sort_header1 .= "<script id=\"imagepath\"> \"" . $images . "\" </script>\n";
+$sort_header1 .= "<script src=\"" . $mytjs . "\" > </script>\n";
+$sort_header1 .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n";
 
 // header for sortable table of episodes, series ids, etc.
 $sort_table .= "<br>\n<h4>\n<table id=\"Summary\" class=\"sortable\" border=\"1\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n";
@@ -245,7 +312,6 @@ foreach($tivos as $tivo) {
 			 $sug_header, $sug_table, $sug_footer, $sug_html_file, $sug_log_file, $sug_html_file, $archNowPlaying, $nowPlaying,
 			 $groups, $groups_series, $groups_count, $groups_newdate, $groups_olddate);
 
-
 	// collect the data for the TiVo
 	$tivoxml = new Tivo_XML();
 	if($xml_path == "") $xml_path = "xml" . delim;
@@ -262,7 +328,7 @@ foreach($tivos as $tivo) {
 	$freespace = 0;
 	$totalnumsuggestions = 0;
 	$totalsuggestions = 0;
-
+	$series_count = $icnt; // for groups each DVR
 	// $nowPlaying Web page for the Now Playing List
 	$nowPlaying 	= $tivo['name'] . "_nowplaying.htm";
 
@@ -297,7 +363,10 @@ foreach($tivos as $tivo) {
 		include($binpath . "rss.php");	// rss code moved to external file rss.php
 	}
 
-	$header .= "<!DOCTYPE html>\n";
+	$header = "<!DOCTYPE html>\n";
+	// Debugging code
+	$header .= "\n<!-- Hello from HEADER $icnt -->\n";
+
 	$header .= "<html><head>\n";
 	$header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 	$header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
@@ -311,10 +380,10 @@ foreach($tivos as $tivo) {
  	$header .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
 
 	if (file_exists("$image_path". "tivo_" . $tivo['model'] . ".png")){
-		$header .= "<h1> <img src=\"" .$images. "tivo_" . $tivo['model'] . ".png\"><br>" . $tivo['nowplaying'] . " </h1>\n";
+		$header .= "<h1> <img src=\"" .$images. "tivo_" . $tivo['model'] . ".png\" alt=\"tivo ".$tivo['model']."\"><br>" . $tivo['nowplaying'] . " </h1>\n";
 	} else {
 		print("Missing model image: " . "$image_path". "tivo_" . $tivo['model'] . ".png\n");
-	 	$header .= "<h1> <img src=" .$images. "tivo_logo.png ><br> " . $tivo['nowplaying'] . " </h1>\n";
+	 	$header .= "<h1> <img src=" .$images. "tivo_logo.png alt=\"tivo\" ><br> " . $tivo['nowplaying'] . " </h1>\n";
 	}
 	$header .= "<h2> Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 
@@ -356,25 +425,30 @@ foreach($tivos as $tivo) {
 
 			// $content .= "<div class=\"programitem\">\n";
 			$content.="<div>\n"; // div.programitem no longer in css file
-			$content .= "<img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\">\n";
+
+			// for debugging tool tip displays the $icnt value
+			//$content .= "<img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\">\n";
+			$content .= "<span title= \" Expand:( " . $icnt . ")\"> <img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"check box\" ></span>\n";
 
 			if ($customicon[3] != "") {
-				$content .= "<img src=\"" .$images. "" . $customicon[3] . ".png\" width=\"16\" height=\"16\">\n";
+				$content .= "<img src=\"" .$images. "" . $customicon[3] . ".png\" width=\"16\" height=\"16\" alt=\"".$customicon[3]."\">\n";
 			}
 			else {
-				$content .= "<img src=\"" .$images. "" . "regular-recording.png\" width=\"16\" height=\"16\">\n";
+				$content .= "<img src=\"" .$images. "" . "regular-recording.png\" width=\"16\" height=\"16\" alt=\"regular recording\">\n";
 			}
 
 			if ($imdblinks == 1) {
 				$imdb = str_replace(" ", "%20", $tivoarray[$i]['title']);
-				$content .= "<a href=\"http://www.imdb.com/find?q=" . $imdb . ";tt=on;nm=on;mx=20\" target=\"_blank\"><img src=\"" .$images. "imdb.png\" border=\"0\" width=\"16\" height=\"16\"></a>\n";
+				$content .= "<a href=\"http://www.imdb.com/find?q=" . $imdb . ";tt=on;nm=on;mx=20\" target=\"_blank\"><img src=\"" .$images. "imdb.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"i m b d\"></a>\n";
 			}
 
 			if ($disablexmllinks == 0){
 				$content .= "<a href=" . $tivoarray[$i]['tivovideodetails'] . ">";
 			}
 
-			$content .= "<span class=\"name\">" . $tivoarray[$i]['title'] . "</span>";
+			//restore tooltip from 2015 Handy to find DVR when scrolled down lage ALL DVR's now playings
+			//$content .= "<span class=\"name\">" . $tivoarray[$i]['title'] . "</span>";
+			$content .= "<span class=\"name\" title=\"" . $tivo['nowplaying'] . "\">" . $tivoarray[$i]['title'] . "</span>";
 
 			if ($tivoarray[$i]['episodetitle'] != "")
 				$content .= " - <span class=\"eptitle\">" . $tivoarray[$i]['episodetitle'] . "</span>\n";
@@ -433,11 +507,21 @@ foreach($tivos as $tivo) {
 				}
 			}
 
-               		// add a row to the sortable table
+ 			// add a row to the sortable table (sortable episode list)
 			$sort_table .= "<tr>";
 			$sort_table .= "<td>" . $tivo ['name'] ."</td>";
-			$sort_table .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
-			$sort_table .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
+			//$sort_table .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
+			$sort_table .= "<td> <span class=\"name\" title=\"" . $tivo['nowplaying'] . "\">" . $tivoarray[$i]['title'] . "</span></td>";
+
+			$sort_table .= "<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">";		// tooltip
+
+			// There is no episode title for Movies and Specials
+			if($tivoarray [$i] ['episodetitle'] == ""){
+				$sort_table .= "<center> - </center></span> </td>";	// still want the ToolTip
+			} else {
+				$sort_table .= $tivoarray [$i] ['episodetitle'] . " </span> </td>";	// episode title
+			}
+
 			$sort_table .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
 			$sort_table .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 			$sort_table .= "<td sorttable_customkey=\"" . tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) .
@@ -449,7 +533,7 @@ foreach($tivos as $tivo) {
 			$groups_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];
 			$groups_count[$tivoarray [$i] ['seriesid']]++;
 
-			// preload a valid date first encounter
+			// preload a valid date first encounter otherwize date checks get messed up
 			if($groups_newdate[$tivoarray [$i] ['seriesid']] == "")
  				$groups_newdate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
  			if($groups_olddate[$tivoarray [$i] ['seriesid']] == "")
@@ -464,35 +548,69 @@ foreach($tivos as $tivo) {
 				$groups_olddate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
 			}
 			// End collect info for the collapsible tables header
-			
+
 			// add the TiVo's name for the first field in the sort table
-			$groups[$tivoarray [$i] ['seriesid']] .= "<tr>";
+			$groups[$tivoarray [$i] ['seriesid']] .= "\n<tr>";
 			// add shows title to sort table
-			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
-				
+
+			// Tool Tip for TiVo name in Groups
+			$groups[$tivoarray [$i] ['seriesid']] .=
+					"\n<td> <span title=\"" . $tivo ['name'] . "\nModel: " . $tivo ['model'] . "\nSize: " . $tivo ['size_gb'] . " GB\">" .
+			 		$tivo ['shorttitle'] .",</span></td>";
+
+			// Tool Tip for status icon in Groups
 			if ($customicon[3] != "") {
-				$groups[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
-						$customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
+				$groups[$tivoarray [$i] ['seriesid']] .=
+						"\n<td> <span title=\"" . $customicon[3] . "\">".
+						"<center><img src=\"" .$images.
+						$customicon[3] . ".png\" width=\"16\" height=\"16\" alt=\"".$customicon[3]."\"></center></span></td>\n";
 			}
 			else {
-				$groups[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
-						"regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
+				$groups[$tivoarray [$i] ['seriesid']] .=
+						"\n<td> <span title=\"regular-recording" . "\">".
+						"<center><img src=\"" .$images.
+						"regular-recording.png\" width=\"16\" height=\"16\" alt=\"recording\"></center></span></td>\n";
 			}
-			// add shows title to sort table
-			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
-			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
-			$groups[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
-				// record date index on sortable numeric value
-				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .
-				// record date viewable format
-				tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";
 
+			// add shows title to sort table
+			// Tool Tip for series name in Groups
+			$groups[$tivoarray [$i] ['seriesid']] .=
+					"\n<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .		// tooltip
+					$tivoarray [$i] ['title'] ."</span></td>\n";									// title
+
+			// Tool Tip for Episode in Groups
+			$groups[$tivoarray [$i] ['seriesid']] .=
+				 "\n<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">";		// tooltip
+			if($tivoarray [$i] ['episodetitle'] == ""){ 								// No episode title for Movies and Specials
+				$groups[$tivoarray [$i] ['seriesid']] .= "<center> - </center></span> </td>\n";	// still want the ToolTip
+			} else {
+				 $groups[$tivoarray [$i] ['seriesid']] .= $tivoarray [$i] ['episodetitle'] . " </span> </td>\n";	// episode title
+			}
+
+			// Tool Tip for Record Date in Groups
+			$groups[$tivoarray [$i] ['seriesid']] .="\n<td sorttable_customkey=\"" .
+				// record date index on sortable numeric value
+				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .			// Sort value
+				// record date viewable format
+				"<span title=\"Channel: " . $tivoarray[$i]['sourcestation'] . " (" . $sc[0] . ")" .
+				"\nDuration: " . mSecsToTime($tivoarray [$i] ['duration']) . "\">" .					// tooltip Channel and Duration
+				 tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</span></td>\n";	// Date
+
+			// Tool Tip for ProgramID in groups
 			// Note: ProgramID and Series are for testing may be removed one or both in the future
-			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
-			$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
+			$groups[$tivoarray [$i] ['seriesid']] .=
+				 "\n<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .			// tooltip
+				 $tivoarray [$i] ['programid'] . " </span> </td>\n";						// programid
+
+			// End of Table Row
+
+			$groups[$tivoarray [$i] ['seriesid']] .= "</tr>\n";
+
+			// Removed Series ID from table
+			//$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 
 			// Collect info for the collapsible tables header for ALL DVRs
-			// save the series name and count the episodes (a multidimensional array would be better)
+			// save the series name and count the episodes for processing later (a multidimensional array would be better)
 			$folders_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];
 			$folders_count[$tivoarray [$i] ['seriesid']]++;
 
@@ -501,7 +619,7 @@ foreach($tivos as $tivo) {
  				$folders_newdate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
  			if($folders_olddate[$tivoarray [$i] ['seriesid']] == "")
  				$folders_olddate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
-			
+
 			// youngest recording
 			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['seriesid']]) {
 				$folders_newdate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
@@ -511,33 +629,62 @@ foreach($tivos as $tivo) {
 				$folders_olddate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
 			}
 			// End collect info for the collapsible tables header for ALL DVRs
-					
+
 			// add the TiVo's name for the first field in the sort table
 			$folders[$tivoarray [$i] ['seriesid']] .= "<tr>";
 			// add show's title to sort table
-			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivo ['shorttitle'] ."</td>";
-			
+
+			// Tool Tip for TiVo name in folders
+			$folders[$tivoarray [$i] ['seriesid']] .=
+			"<td> <span title=\"" . $tivo ['name'] . "\nModel: " . $tivo ['model'] . "\nSize: " . $tivo ['size_gb'] . " GB\">" .
+			$tivo ['shorttitle'] ."</span></td>";
+
+			// Tool Tip for Status icon in folders
 			if ($customicon[3] != "") {
-				$folders[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
-				 $customicon[3] . ".png\" width=\"16\" height=\"16\"></center></td>\n";
+				$folders[$tivoarray [$i] ['seriesid']] .=
+				"<td> <span title=\"" . $customicon[3] . "\">".
+				"<center><img src=\"" .$images. "" .
+				$customicon[3] . ".png\" width=\"16\" height=\"16\" alt=\"".$customicon[3]."\"></center></span></td>\n";
 			}
 			else {
-				$folders[$tivoarray [$i] ['seriesid']] .= "<td><center><img src=\"" .$images. "" .
-				 "regular-recording.png\" width=\"16\" height=\"16\"></center></td>\n";
+				$folders[$tivoarray [$i] ['seriesid']] .=
+				"<td> <span title=\"regular-recording" . "\">".
+				"<center><img src=\"" .$images. "" .
+				"regular-recording.png\" width=\"16\" height=\"16\" alt=\"regular recording\"></center></span></td>\n";
 			}
 
 			// add show's title to sort table
-			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['title'] ."</td>";
-			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['episodetitle'] ."</td>";
+			// Tool Tip for Title in folders
+			$folders[$tivoarray [$i] ['seriesid']] .=
+			"<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .		// tooltip
+			$tivoarray [$i] ['title'] ."</span></td>";									// title
+
+			// Tool Tip for SeriesID in folders
+			$folders[$tivoarray [$i] ['seriesid']] .=
+			"<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">";			// tooltip
+			if($tivoarray [$i] ['episodetitle'] == ""){ 								// No episode title for Movies and Specials
+				$folders[$tivoarray [$i] ['seriesid']] .= "<center> - </center></span> </td>";	// still want the ToolTip
+			} else {
+				$folders[$tivoarray [$i] ['seriesid']] .= $tivoarray [$i] ['episodetitle'] . " </span> </td>";	// episode title
+			}
+
+			// Tool Tip Record Date in folders
 			$folders[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
 				// record date index on sortable numeric value
-				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .
+			tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .			// Sort value
 				// record date viewable format
-				tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</td>";
+			"<span title=\"Channel: " . $tivoarray[$i]['sourcestation'] . " (" . $sc[0] . ")" .
+			"\nDuration: " . mSecsToTime($tivoarray [$i] ['duration']) . "\">" .					// tooltip Channel and Duration
+			tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</span></td>";	// Date
 
+			// Tool Tip for Program ID in folders
 			// Note: ProgramID and Series are for testing may be removed one or both in the future
-			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['programid'] ."</td>";
-			$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
+			$folders[$tivoarray [$i] ['seriesid']] .=
+				 "<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .			// tooltip
+				 $tivoarray [$i] ['programid'] . " </span> </td>";						// programid
+
+			// Removed SeriesID from table
+			//$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 
 		} // loop through tivoarray
 	} // if tivoarray is not null
@@ -566,8 +713,7 @@ foreach($tivos as $tivo) {
 			fwrite($fpt, "?>\n");
 			fclose($fpt);
 
-			// TODO remove debug logging
-			// debug tracking size totals
+			// log for tracking size totals
 			// log file to track drive size and computed drive size history
 			$fpt = @fopen("log". delim . $tivo['name'] . "_track_drive_size.log", 'a');
 			fwrite($fpt, "// " .date("F j, Y, g:i a") . "\t" . $tivo['size_gb'] . " GB\t" . toGB($totalsize) . " GB\n");
@@ -610,14 +756,19 @@ foreach($tivos as $tivo) {
 	fwrite($fp1, $header . $content . $footer);
 	fclose($fp1);
 
-	$series_count=0;	// Used to create a unique handle for each group
 	$fp1 = @fopen($nowPlayingGroups, "w");
 	fwrite($fp1, $header . "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n");
 	foreach($groups as $x => $x_value) {	// Procress the entire array
-		$series_count++;
-		// header for each series put in loop to give each table a unique ID from the seriesid
-		fwrite($fp1, "<div><img src=\"" .$images. "folder.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
-		fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span><span class=\"desc\"> (" . $groups_count[$x]);
+		  fwrite($fp1, "<div><span title= \" Expand: " . $icnt . "\"> " .
+		               "<img src=\"" . $images . "folder.png\" id=\"plusminus" . $series_count . "\" onclick=\"toggleItem(" . $series_count . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"folder\"></span>\n");
+
+		// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
+		if($x == ""){
+			fwrite($fp1, "<span class=\"name\" > <mark><i><b>" . "Movies and Specials" . "</b></i></mark></span><span class=\"desc\"> (" . $groups_count[$x]);
+		} else {
+			fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span><span class=\"desc\"> (" . $groups_count[$x]);
+		}
+
 		if ($groups_count[$x] > 1) {
 			fwrite($fp1, " episodes; ");
 		}
@@ -628,17 +779,17 @@ foreach($tivos as $tivo) {
 		if($groups_count[$x] > 1)
 			fwrite($fp1, " &rarr; " . tivoDate("F j, Y, g:i a", $groups_newdate[$x]));
 		fwrite($fp1, ") </span>");
-		fwrite($fp1, "<div class=\"item\" id=\"myTbody".$series_count."\">\n");
+		fwrite($fp1, "<div class=\"item\" id=\"myTbody" . $series_count++ . "\">\n");
 		fwrite($fp1, "<h4>\n<table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
-		fwrite($fp1, "	<tr>
-					<th> TiVo </th>
-					<th class=\"sorttable\"> Status </th>
-					<th class=\"sorttable\"> Series Name </th>
-					<th class=\"sorttable\"> Episode </th>
-					<th class=\"sorttable_numeric\"> Record Date </th>
-					<th class=\"sorttable\"> Program ID </th>
-					<th class=\"sorttable\"> Series ID </th>
-					</tr>\n");
+		fwrite($fp1, "\n<tr>
+				<th> TiVo </th>
+				<th class=\"sorttable\"> Status </th>
+				<th class=\"sorttable\"> Series Name </th>
+				<th class=\"sorttable\"> Episode </th>
+				<th class=\"sorttable_numeric\"> Record Date </th>
+				<th class=\"sorttable\"> Program ID </th>
+				</tr>\n");
+
 		fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
 		fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
 	}
@@ -666,6 +817,8 @@ foreach($tivos as $tivo) {
 
 			// make a header for the summary of suggestions page
 			$sug_header .= "<!DOCTYPE html>\n";
+			// Debugging code
+			$sug_header .= "\n<!-- Hello from SUG_HEADER $icnt -->\n";
 			$sug_header .= "<html><head>\n";
 			$sug_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
 			$sug_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
@@ -694,7 +847,7 @@ foreach($tivos as $tivo) {
 	// for summary table
 	if($tivoarray == null) {			// if TiVo is off line create a placeholder
 		$sum_table .= "<td bgcolor = \"silver\" >";
-		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "<img src=\"" .$images. "" . "folder.png\" width=\"16\" height=\"16\">" . "</a>";
+		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "<img src=\"" .$images. "" . "folder.png\" width=\"16\" height=\"16\" alt=\"folder\">" . "</a>";
 		$sum_table .= " <a href=" . $nowPlaying . " title=\"".$tivo['shorttitle']."'s Now Playing\">" . $tivo['shorttitle'] . "</a> ";
 		$sum_table .= "</td>";
 		$sum_table .= "<td bgcolor = \"silver\">" . $tivo['size_gb'] . " GB</td> ";
@@ -707,7 +860,7 @@ foreach($tivos as $tivo) {
 	}
 	else { 								// new add entry to the summary table
 		$sum_table .= "<td> ";
-		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "<img src=\"" .$images. "" . "folder.png\" width=\"16\" height=\"16\">" . "</a>";
+		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "<img src=\"" .$images. "" . "folder.png\" width=\"16\" height=\"16\" alt=\"folder\">" . "</a>";
 		$sum_table .= " <a href=" . $nowPlaying . " title=\"".$tivo['shorttitle']."'s Now Playing\">" . $tivo['shorttitle'] . "</a> ";
 		$sum_table .= "</td>";
 		$sum_table .= "<td>" . $tivo['size_gb'] . " GB</td> ";
@@ -736,7 +889,7 @@ foreach($tivos as $tivo) {
 		$allcontent .= "<h1> <img src=\"" .$images. "tivo_" . $tivo['model'] . ".png\"><br>" . $tivo['nowplaying'] . " </h1>\n";
 	} else {
 		print("Missing model image: " . "$image_path". "tivo_" . $tivo['model'] . ".png\n");
-	 	$allcontent .= "<h1> <img src=" .$images. "tivo_logo.png ><br> " . $tivo['nowplaying'] . " </h1>\n";
+	 	$allcontent .= "<h1> <img src=" .$images. "tivo_logo.png alt=\"TiVo\" alt=\"TiVo\" ><br> " . $tivo['nowplaying'] . " </h1>\n";
 	}
 	//TODO alternate colors for each TiVo or some way to label which box the program is on
 	$allcontent .= $content;	// add content to list of all recordings web page
@@ -758,7 +911,7 @@ $nowPlaying = "alldvrs.htm";
 $sum_table .= "<tr> "; // start of new row in the table for summary page data
 
 $sum_table .= "<td style=\"text-align:justify\">";
-$sum_table .= " <a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "<img src=\"" .$images. "" . "folder.png\" width=\"16\" height=\"16\">" . "</a>";
+$sum_table .= " <a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "<img src=\"" .$images. "" . "folder.png\" width=\"16\" height=\"16\" alt=\"folder\">" . "</a>";
 $sum_table .= " <a href=" . $nowPlaying . " title=\"'s Now Playing\">" .  "ALL" . "</a> ";
 $sum_table .= "</td>";
 
@@ -836,13 +989,20 @@ fclose ( $fp1 );
 
 $series_count=0;	// Used to create a unique handle for each group
 $fp1 = @fopen($foldershtm, "w");
-fwrite($fp1, $sort_header);
+fwrite($fp1, $sort_header1);
 
 foreach($folders as $x => $x_value) {	// Procress the entire array
-	$series_count++;
 	// header for each series put in loop to give each table a unique ID from the seriesid
-	fwrite($fp1, "<div><img src=\"" .$images. "folder.png\" id=\"plusminus".$series_count."\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\">\n");
-	fwrite($fp1, "<span class=\"name\">" . $folders_series[$x] . "</span><span class=\"desc\"> (" . $folders_count[$x]);
+	fwrite($fp1, "<div><img src=\"" .$images. "folder.png\" id=\"plusminus".$series_count.
+		"\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\" alt=\"folder\">\n");
+
+	// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
+ 	if($x == ""){
+  		fwrite($fp1, "<span class=\"name\" > <mark><i><b>" . "Movies and Specials" . "</b></i></mark></span><span class=\"desc\"> (" . $folders_count[$x]);
+ 	} else {
+ 		fwrite($fp1, "<span class=\"name\">" . $folders_series[$x] . "</span><span class=\"desc\"> (" . $folders_count[$x]);
+  	}
+
 	if ($folders_count[$x] > 1) {
 		fwrite($fp1, " episodes; ");
 	}
@@ -853,7 +1013,7 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 	if($folders_count[$x] > 1)
 		fwrite($fp1, " &rarr; " . tivoDate("F j, Y, g:i a", $folders_newdate[$x]));
 	fwrite($fp1, ") </span>");
-	fwrite($fp1, "<div class=\"item\" id=\"myTbody".$series_count."\">\n");
+	fwrite($fp1, "<div class=\"item\" id=\"myTbody" . $series_count++ . "\">\n");
 	fwrite($fp1, "<h4>\n<table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
 	fwrite($fp1, "	<tr>
 					<th> TiVo </th>
@@ -862,14 +1022,12 @@ foreach($folders as $x => $x_value) {	// Procress the entire array
 					<th class=\"sorttable\"> Episode </th>
 					<th class=\"sorttable_numeric\"> Record Date </th>
 					<th class=\"sorttable\"> Program ID </th>
-					<th class=\"sorttable\"> Series ID </th>
 					</tr>\n");
 	fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
 	fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
+	//$series_count++;
 }
-
-fwrite($fp1, $sort_footer );
-fwrite($fp1, "</body></html>");
+fwrite($fp1, $allfooter);
 fclose ( $fp1 );
 
 ?>
