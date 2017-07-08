@@ -139,13 +139,17 @@
  * 20170707
  *  Tooltip Summary table for percent Used
  *
+ * 20170708
+ *  Fixed typo image to $image
+ *  Summary table "ALL" Totals fixed to bottom row
+ *
  *  TODO
  *  {text-align:center;}
  *  Problem with <H4> tag before table
  *
  *
 */
-$LASTUPDATE = "20170707";
+$LASTUPDATE = "20170708a";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -212,13 +216,13 @@ $sum_header .= "<!DOCTYPE html>\n";
 $sum_header .= "\n<!-- Hello from SUM_HEADER $icnt -->\n";
 $sum_header .= "<html><head>\n";
 $sum_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
-$sum_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
+$sum_header .= "<LINK REL=\"shortcut icon\" HREF=\"" . $images . "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
 
 $sum_header .= "<title>TiVo Disk Space - Summary</title>
     <link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\">";
 $sum_header .= "\n</head>\n<body>\n";
 
-$sum_header .= "<h2><img src=images/tivo_logo.png alt=\"TiVo\" ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
+$sum_header .= "<h2><img src=" . $images . "tivo_logo.png alt=\"TiVo\" ><br>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 $sum_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n";
 
 // start of sortable summary table
@@ -287,12 +291,12 @@ $sort_header1 .= $sort_header;
 // link to expand/collapse all entries on the page
 $sort_header1 .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
 
-$sort_header .= "<h1><img src=images/tivo_logo.png  alt=\"TiVo\"> <br> All Now Playing</h1>\n <h2>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
+$sort_header .= "<h1><img src=" . $images . "tivo_logo.png  alt=\"TiVo\"> <br> All Now Playing</h1>\n <h2>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 $sort_header .= "<script id=\"imagepath\"> \"" . $images . "\" </script>\n";
 $sort_header .= "<script src=\"" . $mytjs . "\" > </script>\n";
 $sort_header .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n";
 
-$sort_header1 .= "<h1><img src=images/tivo_logo.png alt=\"TiVo\" > <br> All Now Playing</h1>\n <h2>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
+$sort_header1 .= "<h1><img src=" . $images . "tivo_logo.png alt=\"TiVo\" > <br> All Now Playing</h1>\n <h2>Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 $sort_header1 .= "<script id=\"imagepath\"> \"" . $images . "\" </script>\n";
 $sort_header1 .= "<script src=\"" . $mytjs . "\" > </script>\n";
 $sort_header1 .= "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n";
@@ -372,7 +376,7 @@ foreach($tivos as $tivo) {
 
 	$header .= "<html><head>\n";
 	$header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
-	$header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
+	$header .= "<LINK REL=\"shortcut icon\" HREF=\"" . $images . "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
 	$header .= "<title>" . $tivo['nowplaying'] . "</title><link href=" . $tivo['css'] . " rel=\"stylesheet\" type=\"text/css\" ></head>\n\n";
 	$header .= "<body onload=\"init()\">\n";
 
@@ -383,10 +387,10 @@ foreach($tivos as $tivo) {
  	$header .= "<div class=\"dura\" id=\"plusminusAll\" onclick=\"toggleAll(" . $icnt . ")\" >&#8597;&nbsp;&thinsp; expand/collapse all </div>\n";
 
 	if (file_exists("$image_path". "tivo_" . $tivo['model'] . ".png")){
-		$header .= "<h1> <img src=\"" .$images. "tivo_" . $tivo['model'] . ".png\" alt=\"tivo ".$tivo['model']."\"><br>" . $tivo['nowplaying'] . " </h1>\n";
+		$header .= "<h1> <img src=\"" . $images . "tivo_" . $tivo['model'] . ".png\" alt=\"tivo ".$tivo['model']."\"><br>" . $tivo['nowplaying'] . " </h1>\n";
 	} else {
 		print("Missing model image: " . "$image_path". "tivo_" . $tivo['model'] . ".png\n");
-	 	$header .= "<h1> <img src=" .$images. "tivo_logo.png alt=\"tivo\" ><br> " . $tivo['nowplaying'] . " </h1>\n";
+	 	$header .= "<h1> <img src=" . $images . "tivo_logo.png alt=\"tivo\" ><br> " . $tivo['nowplaying'] . " </h1>\n";
 	}
 	$header .= "<h2> Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
 
@@ -430,19 +434,19 @@ foreach($tivos as $tivo) {
 			$content.="<div>\n"; // div.programitem no longer in css file
 
 			// for debugging tool tip displays the $icnt value
-			//$content .= "<img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\">\n";
-			$content .= "<span title= \" Expand:" . $icnt . "\"> <img src=\"" .$images. "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"check box\" ></span>\n";
+			//$content .= "<img src=\"" . $images . "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\">\n";
+			$content .= "<span title= \" Expand:" . $icnt . "\"> <img src=\"" . $images . "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"check box\" ></span>\n";
 
 			if ($customicon[3] != "") {
-				$content .= "<img src=\"" .$images. "" . $customicon[3] . ".png\" width=\"16\" height=\"16\" alt=\"".$customicon[3]."\">\n";
+				$content .= "<img src=\"" . $images . "" . $customicon[3] . ".png\" width=\"16\" height=\"16\" alt=\"".$customicon[3]."\">\n";
 			}
 			else {
-				$content .= "<img src=\"" .$images. "" . "regular-recording.png\" width=\"16\" height=\"16\" alt=\"regular recording\">\n";
+				$content .= "<img src=\"" . $images . "" . "regular-recording.png\" width=\"16\" height=\"16\" alt=\"regular recording\">\n";
 			}
 
 			if ($imdblinks == 1) {
 				$imdb = str_replace(" ", "%20", $tivoarray[$i]['title']);
-				$content .= "<a href=\"http://www.imdb.com/find?q=" . $imdb . ";tt=on;nm=on;mx=20\" target=\"_blank\"><img src=\"" .$images. "imdb.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"i m d b\"></a>\n";
+				$content .= "<a href=\"http://www.imdb.com/find?q=" . $imdb . ";tt=on;nm=on;mx=20\" target=\"_blank\"><img src=\"" . $images . "imdb.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"i m d b\"></a>\n";
 			}
 
 			if ($disablexmllinks == 0){
@@ -565,13 +569,13 @@ foreach($tivos as $tivo) {
 			if ($customicon[3] != "") {
 				$groups[$tivoarray [$i] ['seriesid']] .=
 						"\n<td> <span title=\"" . $customicon[3] . "\">".
-						"<center><img src=\"" .$images.
+						"<center><img src=\"" . $images .
 						$customicon[3] . ".png\" width=\"16\" height=\"16\" alt=\"".$customicon[3]."\"></center></span></td>\n";
 			}
 			else {
 				$groups[$tivoarray [$i] ['seriesid']] .=
 						"\n<td> <span title=\"regular-recording" . "\">".
-						"<center><img src=\"" .$images.
+						"<center><img src=\"" . $images .
 						"regular-recording.png\" width=\"16\" height=\"16\" alt=\"recording\"></center></span></td>\n";
 			}
 
@@ -646,13 +650,13 @@ foreach($tivos as $tivo) {
 			if ($customicon[3] != "") {
 				$folders[$tivoarray [$i] ['seriesid']] .=
 				"<td> <span title=\"" . $customicon[3] . "\">".
-				"<center><img src=\"" .$images. "" .
+				"<center><img src=\"" . $images . "" .
 				$customicon[3] . ".png\" width=\"16\" height=\"16\" alt=\"".$customicon[3]."\"></center></span></td>\n";
 			}
 			else {
 				$folders[$tivoarray [$i] ['seriesid']] .=
 				"<td> <span title=\"regular-recording" . "\">".
-				"<center><img src=\"" .$images. "" .
+				"<center><img src=\"" . $images . "" .
 				"regular-recording.png\" width=\"16\" height=\"16\" alt=\"regular recording\"></center></span></td>\n";
 			}
 
@@ -824,7 +828,7 @@ foreach($tivos as $tivo) {
 			$sug_header .= "\n<!-- Hello from SUG_HEADER $icnt -->\n";
 			$sug_header .= "<html><head>\n";
 			$sug_header .= "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
-			$sug_header .= "<LINK REL=\"shortcut icon\" HREF=\"" .$images. "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
+			$sug_header .= "<LINK REL=\"shortcut icon\" HREF=\"" . $images . "favicon.ico\" TYPE=\"image/x-icon\">\n\n";
 			$sug_header .= "</head><body><sh>\n<title> Suggestions Summary </title><link href=\"" . $summary_css . "\" rel=\"stylesheet\" type=\"text/css\"></sh>\n\n";
 			$sug_header .= "<div class=\"dura\"><a href=\"" . $myurl . "summary.htm\" > &larr;&thinsp; back to Summary </a></div>";
 			$sug_header .= "<h2> Last Updated: " . date("F j, Y, g:i a") . " </h2>\n";
@@ -850,7 +854,7 @@ foreach($tivos as $tivo) {
 	// for summary table
 	if($tivoarray == null) {			// if TiVo is off line create a placeholder
 		$sum_table .= "<td bgcolor = \"silver\" >";
-		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "<img src=\"" .$images. "" . "folder.png\" width=\"16\" height=\"16\" alt=\"folder\">" . "</a>";
+		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "<img src=\"" . $images . "" . "folder.png\" width=\"16\" height=\"16\" alt=\"folder\">" . "</a>";
 		$sum_table .= " <a href=" . $nowPlaying . " title=\"".$tivo['shorttitle']."'s Now Playing\">" . $tivo['shorttitle'] . "</a> ";
 		$sum_table .= "</td>";
 		$sum_table .= "<td bgcolor = \"silver\">" . $tivo['size_gb'] . " GB</td> ";
@@ -863,7 +867,7 @@ foreach($tivos as $tivo) {
 	}
 	else { 								// new add entry to the summary table
 		$sum_table .= "<td> ";
-		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "<img src=\"" .$images. "" . "folder.png\" width=\"16\" height=\"16\" alt=\"folder\">" . "</a>";
+		$sum_table .= " <a href=" . $nowPlayingGroups . " title=\"". $tivo['shorttitle'] . "'s Now Playing Grouped by series ID\">" . "<img src=\"" . $images . "" . "folder.png\" width=\"16\" height=\"16\" alt=\"folder\">" . "</a>";
 		$sum_table .= " <a href=" . $nowPlaying . " title=\"".$tivo['shorttitle']."'s Now Playing\">" . $tivo['shorttitle'] . "</a> ";
 		$sum_table .= "</td>";
 		$sum_table .= "<td>" . $tivo['size_gb'] . " GB</td> ";
@@ -890,10 +894,10 @@ foreach($tivos as $tivo) {
 
 	$allcontent .= "<br><hr>\n";
 	if (file_exists("$image_path". "tivo_" . $tivo['model'] . ".png")){
-		$allcontent .= "<h1> <img src=\"" .$images. "tivo_" . $tivo['model'] . ".png\"><br>" . $tivo['nowplaying'] . " </h1>\n";
+		$allcontent .= "<h1> <img src=\"" . $images . "tivo_" . $tivo['model'] . ".png\"><br>" . $tivo['nowplaying'] . " </h1>\n";
 	} else {
 		print("Missing model image: " . "$image_path". "tivo_" . $tivo['model'] . ".png\n");
-	 	$allcontent .= "<h1> <img src=" .$images. "tivo_logo.png alt=\"TiVo\" ><br> " . $tivo['nowplaying'] . " </h1>\n";
+	 	$allcontent .= "<h1> <img src=" . $images . "tivo_logo.png alt=\"TiVo\" ><br> " . $tivo['nowplaying'] . " </h1>\n";
 	}
 	//TODO alternate colors for each TiVo or some way to label which box the program is on
 	$allcontent .= $content;	// add content to list of all recordings web page
@@ -912,10 +916,11 @@ $allpercent_free .= floor((mBtoGB($allfreespace) /$all_size_gb)  * 1000)/10;;
 
 // add All Totals to a line on summary table
 $nowPlaying = "alldvrs.htm";
+$sum_table .= "<tfoot>";		// Make All totals fixed at the bottom row
 $sum_table .= "<tr> "; // start of new row in the table for summary page data
 
 $sum_table .= "<td style=\"text-align:justify\">";
-$sum_table .= " <a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "<img src=\"" .$images. "" . "folder.png\" width=\"16\" height=\"16\" alt=\"folder\">" . "</a>";
+$sum_table .= " <a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "<img src=\"" . $images . "" . "folder.png\" width=\"16\" height=\"16\" alt=\"folder\">" . "</a>";
 $sum_table .= " <a href=" . $nowPlaying . " title=\"ALL Now Playing\">" .  "ALL" . "</a> ";
 $sum_table .= "</td>";
 
@@ -938,6 +943,7 @@ if($nplarchives == 1) {
 	$sum_table .="<a href=" . "folders.htm" . " title=\"Sortable episode list\">" . $alltotalnumsuggestions . "</a></td>";
 }
 $sum_table .= "</tr>\n";
+$sum_table .= "</tfoot>";
 // end of add all totals
 
 // save totals and summary
@@ -998,7 +1004,7 @@ fwrite($fp1, $sort_header1);
 
 foreach($folders as $x => $x_value) {	// Procress the entire array
 	// header for each series put in loop to give each table a unique ID from the seriesid
-	fwrite($fp1, "<div><img src=\"" .$images. "folder.png\" id=\"plusminus".$series_count.
+	fwrite($fp1, "<div><img src=\"" . $images . "folder.png\" id=\"plusminus".$series_count.
 		"\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\" alt=\"folder\">\n");
 
 	// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
