@@ -136,6 +136,9 @@
  * 20170628
  *  added required alt text to <img= tag
  *
+ * 20170707
+ *  Tooltip Summary table for percent Used
+ *
  *  TODO
  *  {text-align:center;}
  *  Problem with <H4> tag before table
@@ -871,7 +874,8 @@ foreach($tivos as $tivo) {
 		if($tivo['critical']  > $percent_free) $sum_table .= "<td bgcolor = \"red\">";
 		else if($tivo['warning'] > $percent_free) $sum_table .= "<td bgcolor = \"yellow\">";
 		else  $sum_table .= "<td>";
-		$sum_table .= $percent_free . "%</td>";
+		// Tooltip for percent Used
+		$sum_table .= "<span  title=\"" . (100.0 - $percent_free) . "% Used\">" . $percent_free . "%</span></td>";
 
 		if($nplarchives ==1) {
 			if($totalnumsuggestions < 10) $sum_table .= "<td bgcolor = \"red\">";
@@ -923,7 +927,8 @@ $sum_table .= "<td>" . mBtoGB($allfreespace) . " GB</td> ";
 if($tivo['critical']  > $allpercent_free) $sum_table .= "<td bgcolor = \"red\">";
 else if($tivo['warning'] > $allpercent_free) $sum_table .= "<td bgcolor = \"yellow\">";
 else  $sum_table .= "<td>";
-$sum_table .= $allpercent_free . "%</td>";
+// Tool-tip percent Used
+$sum_table .= "<span  title=\"" . (100.0 - $allpercent_free) . "% Used\">" . $allpercent_free . "%</span></td>";
 
 if($nplarchives == 1) {
 	if($alltotalnumsuggestions < 10) $sum_table .= "<td bgcolor = \"red\">";
