@@ -133,15 +133,19 @@
  *  I think all HTML errors are fixed
  *  last was missing closing tag in the write loop for groups
  *
- * 20170628
+ * 20170628 VicW
  *  added required alt text to <img= tag
  *
- * 20170707
+ * 20170707 VicW
  *  Tooltip Summary table for percent Used
  *
- * 20170708
+ * 20170708 VicW
  *  Fixed typo image to $image
  *  Summary table "ALL" Totals fixed to bottom row
+ *
+ * 20170714 VicW
+ *   Off-line DVR displayed in Groups Movies instead of main page
+ *   Added $offline boolean check when writing $groups
  *
  *  TODO
  *  {text-align:center;}
@@ -149,7 +153,7 @@
  *
  *
 */
-$LASTUPDATE = "20170708a";
+$LASTUPDATE = "20170714";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -343,7 +347,7 @@ foreach($tivos as $tivo) {
 	$nowPlayingGroups 	= $tivo['name'] . "_group.htm";
 	$summaryhtm = "summary.htm";
 	$foldershtm = "folders.htm";	// All grouped by seriesid
-
+	$offline=false;		// used for Groups
 
 	if($nplarchives == 1) {
 		// use suggestions to track free space vs unused space
@@ -399,10 +403,10 @@ foreach($tivos as $tivo) {
 	$header .= "<script src=\"" . $tivo['js'] . "\" > </script>\n";
 
 	$sum_table .= "<tr> "; // start of new row in the table for summary page data
-
 	if($tivoarray == null){ 			// The DVR is OFF-LINE
 		$content .= "<center><font size=12 face=verdana color=\"red\">This TiVo is currently unavailable</font></center>";
 		$groups[0] .= "<center><font size=12 face=verdana color=\"red\">This TiVo is currently unavailable</font></center>";										// add the TiVo's name for the first field in the sort table
+		$offline=true;	// for groups
 	} else {
 		for ($i = 1;$i < count($tivoarray);$i++) {
 			$ci = $tivoarray[$i]['customicon'];
@@ -765,40 +769,45 @@ foreach($tivos as $tivo) {
 
 	$fp1 = @fopen($nowPlayingGroups, "w");
 	fwrite($fp1, $header . "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n");
-	foreach($groups as $x => $x_value) {	// Procress the entire array
-		  fwrite($fp1, "<div><span title= \" Expand: " . $series_count . "\"> " .
-		               "<img src=\"" . $images . "folder.png\" id=\"plusminus" . $series_count . "\" onclick=\"toggleItem(" . $series_count . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"folder\"></span>\n");
+	if($offline == true) {
+		fwrite($fp1, $groups[0]);
+	}
+	else {
+		foreach($groups as $x => $x_value) {	// Procress the entire array
+			  fwrite($fp1, "<div><span title= \" Expand: " . $series_count . "\"> " .
+			               "<img src=\"" . $images . "folder.png\" id=\"plusminus" . $series_count . "\" onclick=\"toggleItem(" . $series_count . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"folder\"></span>\n");
 
-		// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
-		if($x == ""){
-			fwrite($fp1, "<span class=\"name\" > <mark><i><b>" . "Movies and Specials" . "</b></i></mark></span><span class=\"desc\"> (" . $groups_count[$x]);
-		} else {
-			fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span><span class=\"desc\"> (" . $groups_count[$x]);
-		}
+			// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
+			if($x == ""){
+				fwrite($fp1, "<span class=\"name\" > <mark><i><b>" . "Movies and Specials" . "</b></i></mark></span><span class=\"desc\"> (" . $groups_count[$x]);
+			} else {
+				fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span><span class=\"desc\"> (" . $groups_count[$x]);
+			}
 
-		if ($groups_count[$x] > 1) {
-			fwrite($fp1, " episodes; ");
-		}
-		else {
-			fwrite($fp1, " episode; ");
-		}
-		fwrite($fp1, tivoDate("F j, Y, g:i a", $groups_olddate[$x]));
-		if($groups_count[$x] > 1)
-			fwrite($fp1, " &rarr; " . tivoDate("F j, Y, g:i a", $groups_newdate[$x]));
-		fwrite($fp1, ") </span>");
-		fwrite($fp1, "<div class=\"item\" id=\"myTbody" . $series_count++ . "\">\n");
-		fwrite($fp1, "<h4>\n<table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
-		fwrite($fp1, "\n<tr>
-				<th> TiVo </th>
-				<th class=\"sorttable\"> Status </th>
-				<th class=\"sorttable\"> Series Name </th>
-				<th class=\"sorttable\"> Episode </th>
-				<th class=\"sorttable_numeric\"> Record Date </th>
-				<th class=\"sorttable\"> Program ID </th>
-				</tr>\n");
+			if ($groups_count[$x] > 1) {
+				fwrite($fp1, " episodes; ");
+			}
+			else {
+				fwrite($fp1, " episode; ");
+			}
+			fwrite($fp1, tivoDate("F j, Y, g:i a", $groups_olddate[$x]));
+			if($groups_count[$x] > 1)
+				fwrite($fp1, " &rarr; " . tivoDate("F j, Y, g:i a", $groups_newdate[$x]));
+			fwrite($fp1, ") </span>");
+			fwrite($fp1, "<div class=\"item\" id=\"myTbody" . $series_count++ . "\">\n");
+			fwrite($fp1, "<h4>\n<table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
+			fwrite($fp1, "\n<tr>
+					<th> TiVo </th>
+					<th class=\"sorttable\"> Status </th>
+					<th class=\"sorttable\"> Series Name </th>
+					<th class=\"sorttable\"> Episode </th>
+					<th class=\"sorttable_numeric\"> Record Date </th>
+					<th class=\"sorttable\"> Program ID </th>
+					</tr>\n");
 
-		fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
-		fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
+			fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
+			fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
+		}
 	}
 
 	fwrite($fp1, $footer);
