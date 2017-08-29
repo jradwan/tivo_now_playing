@@ -129,7 +129,7 @@
  *  Addition of tool-tip episode summary to sort
  *  TODO add sort tool-tip for time
  *
- * 20170627	VicW
+ * 20170627 VicW
  *  I think all HTML errors are fixed
  *  last was missing closing tag in the write loop for groups
  *
@@ -143,14 +143,14 @@
  *  Fixed typo image to $image
  *  Summary table "ALL" Totals fixed to bottom row
  *
- * 20170714
+ * 20170714 VicW
  *   Off-line DVR displayed in Groups Movies instead of main page
  *   Added $offline boolean check when writing $groups
  *
- * 20170804
+ * 20170804 VicW (TiVoHomeUser)
  *   Changed tool tip for program ID in Group tables from Series ID to Episode Number
  *
- * 20170828
+ * 20170828 VicW
  *   Added to the tivo array a series ID index 'sidindex' basically it is just a copy of 'programid' except for Movies that get assigned 'MV'
  *   forcing movies to be grouped together allowing access to the original program and series id
  *
