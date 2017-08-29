@@ -162,7 +162,7 @@
  *
  *
 */
-$LASTUPDATE = "20170828";
+$LASTUPDATE = "20170829a";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -793,13 +793,13 @@ foreach($tivos as $tivo) {
 
 			if ($x == "MV") {
 				// Special case for Movies
-				fwrite ( $fp1, "<span class=\"name\" > <mark><i><b>" . "Movies" . "</b></i></mark></span><span class=\"desc\"> (" . $folders_count [$x] );
+				fwrite ( $fp1, "<span class=\"name\" > <mark><i><b>" . "Movies" . "</b></i></mark></span><span class=\"desc\"> (" . $groups_count [$x] );
 			} else {
 				// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
 				if ($x == "") {
-					fwrite ( $fp1, "<span class=\"name\" > <mark><i><b>" . "Uncategorized" . "</b></i></mark></span><span class=\"desc\"> (" . $folders_count [$x] );
+					fwrite ( $fp1, "<span class=\"name\" > <mark><i><b>" . "Uncategorized" . "</b></i></mark></span><span class=\"desc\"> (" . $groups_count [$x] );
 				} else {
-					fwrite ( $fp1, "<span class=\"name\">" . $folders_series [$x] . "</span><span class=\"desc\"> (" . $folders_count [$x] );
+					fwrite ( $fp1, "<span class=\"name\">" . $folders_series [$x] . "</span><span class=\"desc\"> (" . $groups_count [$x] );
 				}
 			}
 
@@ -933,7 +933,7 @@ foreach($tivos as $tivo) {
 	$alltotalsuggestions 	+= $totalsuggestions;
 	$alltotalnumsuggestions += $totalnumsuggestions;
 	$allfreespace 		+= $freespace;
-	$alltotalitems 		+=$totalitems;
+	$alltotalitems 		+= $totalitems;
 	$alltotallength 	+= $totallength;
 	$all_size_gb 		+= $drivesize; //$tivo['size_gb'];
 
