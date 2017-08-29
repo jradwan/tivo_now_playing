@@ -455,7 +455,7 @@ foreach($tivos as $tivo) {
 
 			// for debugging tool tip displays the $icnt value
 			//$content .= "<img src=\"" . $images . "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\">\n";
-			$content .= "<span title= \" Expand:" . $icnt . "\"> <img src=\"" . $images . "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"check box\" ></span>\n";
+			$content .= "<span title= \" Expand: " . $icnt . "\"> <img src=\"" . $images . "checkbox.png\" id=\"plusminus" . $icnt . "\" onclick=\"toggleItem(" . $icnt . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"check box\" ></span>\n";
 
 			if ($customicon[3] != "") {
 				$content .= "<img src=\"" . $images . "" . $customicon[3] . ".png\" width=\"16\" height=\"16\" alt=\"".$customicon[3]."\">\n";
@@ -713,7 +713,6 @@ foreach($tivos as $tivo) {
 			// Removed SeriesID from table
 			//$folders[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 
-
 		} // loop through tivoarray
 	} // if tivoarray is not null
 
@@ -949,7 +948,7 @@ $sum_table .= "<tr> "; // start of new row in the table for summary page data
 
 $sum_table .= "<td style=\"text-align:justify\">";
 $sum_table .= " <a href=" . $foldershtm . " title=\" All Now Playing Grouped by series ID\">" . "<img src=\"" . $images . "" . "folder.png\" width=\"16\" height=\"16\" alt=\"folder\">" . "</a>";
-$sum_table .= " <a href=" . $nowPlaying . " title=\"ALL Now Playing\">" .  "ALL" . "</a> ";
+$sum_table .= " <a href=" . $nowPlaying . " title=\"All Now Playing\">" .  "ALL" . "</a> ";
 $sum_table .= "</td>";
 
 $sum_table .= "<td>" . $all_size_gb . " GB</td> ";
