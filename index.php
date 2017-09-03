@@ -154,15 +154,21 @@
  *   Added to the tivo array a series ID index 'sidindex' basically it is just a copy of 'programid' except for Movies that get assigned 'MV'
  *   forcing movies to be grouped together allowing access to the original program and series id
  *
+ * 20170903 VicW
+ *   Tooltip for the DVR name in groups was displaying the drive size from the settings file not the adjusted size.
+ *   Moved the read from the auto adjust drive size file to a function
+ *    calling it before inserting the DVR's data in the HTML files
+ *   
  *  TODO
  *  {text-align:center;}
  *  Problem with <H4> tag before table
  *  Date range for Movies and Uncategorized sometimes are not correct.
+ *  Find out how kmttg gets the episode number most are missing here
  *
  *
  *
 */
-$LASTUPDATE = "20170830";
+$LASTUPDATE = "20170903";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -178,6 +184,20 @@ if (stristr($_ENV["OS"], "Windows") !== false) {
 $binpath = "bin" . delim;  // defined here to find the settings file
 require_once($binpath . "tivo_settings.php");
 require_once($binpath . "class_tivo_xml.php");
+
+// Adjust the TiVo's drive size from tivo_settings.php with the one created in the auto size file if one exists.
+// Function currently is called twice first before creating the html pages then again for creating a new auto drive size file
+// function could be removed this probably needs to be called only the first time.
+function adjust_drive_size($m_auto_size_file_name, $m_auto_size_gb) {
+	if(file_exists($m_auto_size_file_name)){ // possible new drive size
+		include($m_auto_size_file_name); // $auto_size_gb = "nnnn";
+		if( $auto_size_gb > $m_auto_size_gb){
+			$m_auto_size_gb = $auto_size_gb; // Use the larger, -1 disables autosize
+		}
+	}
+	return $m_auto_size_gb;
+}
+
 
 // make a new path for the XML files if needed
 if(!file_exists($xml_path)) {
@@ -410,6 +430,13 @@ foreach($tivos as $tivo) {
 	// include javascript  tivo_now_playing.js
 	$header .= "<script id=\"imagepath\"> \"" . $images . "\" </script>\n";
 	$header .= "<script src=\"" . $tivo['js'] . "\" > </script>\n";
+
+	// Update drive size from the auto drive size file
+	$auto_size_file_name = ("log". delim . $tivo['name'] . "_drive_size.php");
+	$auto_size_gb = adjust_drive_size($auto_size_file_name, $tivo['size_gb']);
+	if($auto_size_gb > $tivo['size_gb']) {
+		$tivo['size_gb'] = $auto_size_gb;
+	}
 
 	$sum_table .= "<tr> "; // start of new row in the table for summary page data
 	if($tivoarray == null){ 			// The DVR is OFF-LINE
@@ -716,19 +743,9 @@ foreach($tivos as $tivo) {
 		} // loop through tivoarray
 	} // if tivoarray is not null
 
-		// adjust for drive size entered too small use total recorded size
-		$auto_size_gb = $tivo['size_gb'];
-		$auto_size_file_name = ("log". delim . $tivo['name'] . "_drive_size.php");
-
-		if(file_exists($auto_size_file_name)){ // possible new drive size
-			include($auto_size_file_name); // $auto_size_gb = "nnnn";
-			if($auto_size_gb < 0){
-				$auto_size_gb = $tivo['size_gb']; // disable auto size
-			} else {
-				$tivo['size_gb'] = $auto_size_gb;
-			}
-		}
-
+	// adjust for drive size entered too small use total recorded size
+	// Update auto drive size if enabled (- value from file disables)
+	if($auto_size_gb >= 0){
 		if(toGB($totalsize) > $auto_size_gb) {
 			$fpt = @fopen($auto_size_file_name, 'w+');
 			fwrite($fpt, "<?php\n\n");
@@ -748,6 +765,7 @@ foreach($tivos as $tivo) {
 			fclose($fpt);
 			// end of debug logging code
 		}
+	}
 		$totalitems = $tivoarray[0]['totalitems'];
 		$freespace = ((intval(trim($tivo['size_gb']))) * 1024) - toMB($totalsize);
 
@@ -1066,8 +1084,6 @@ foreach ( $folders as $x => $x_value ) { // Procress the entire array
 					</tr>\n" );
 	fwrite ( $fp1, $x_value . "\n" ); // write the rows of the table collected and formatted in the tivo loop
 	fwrite ( $fp1, "</table>\n</h4></div>\n</div>\n" );
-	// $series_count++;
-	// print("\nxvalue =\t" . $x_value . "\n");
 }
 fwrite($fp1, $allfooter);
 fclose ( $fp1 );
