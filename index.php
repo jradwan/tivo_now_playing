@@ -129,7 +129,7 @@
  *  Addition of tool-tip episode summary to sort
  *  TODO add sort tool-tip for time
  *
- * 20170627	VicW
+ * 20170627 VicW
  *  I think all HTML errors are fixed
  *  last was missing closing tag in the write loop for groups
  *
@@ -147,13 +147,28 @@
  *   Off-line DVR displayed in Groups Movies instead of main page
  *   Added $offline boolean check when writing $groups
  *
+ * 20170804 VicW (TiVoHomeUser)
+ *   Changed tool tip for program ID in Group tables from Series ID to Episode Number
+ *
+ * 20170828 VicW
+ *   Added to the tivo array a series ID index 'sidindex' basically it is just a copy of 'programid' except for Movies that get assigned 'MV'
+ *   forcing movies to be grouped together allowing access to the original program and series id
+ *
+ * 20170903 VicW
+ *   Tooltip for the DVR name in groups was displaying the drive size from the settings file not the adjusted size.
+ *   Moved the read from the auto adjust drive size file to a function
+ *    calling it before inserting the DVR's data in the HTML files
+ *   
  *  TODO
  *  {text-align:center;}
  *  Problem with <H4> tag before table
+ *  Date range for Movies and Uncategorized sometimes are not correct.
+ *  Find out how kmttg gets the episode number most are missing here
+ *
  *
  *
 */
-$LASTUPDATE = "20170714";
+$LASTUPDATE = "20170903";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -169,6 +184,20 @@ if (stristr($_ENV["OS"], "Windows") !== false) {
 $binpath = "bin" . delim;  // defined here to find the settings file
 require_once($binpath . "tivo_settings.php");
 require_once($binpath . "class_tivo_xml.php");
+
+// Adjust the TiVo's drive size from tivo_settings.php with the one created in the auto size file if one exists.
+// Function currently is called twice first before creating the html pages then again for creating a new auto drive size file
+// function could be removed this probably needs to be called only the first time.
+function adjust_drive_size($m_auto_size_file_name, $m_auto_size_gb) {
+	if(file_exists($m_auto_size_file_name)){ // possible new drive size
+		include($m_auto_size_file_name); // $auto_size_gb = "nnnn";
+		if( $auto_size_gb > $m_auto_size_gb){
+			$m_auto_size_gb = $auto_size_gb; // Use the larger, -1 disables autosize
+		}
+	}
+	return $m_auto_size_gb;
+}
+
 
 // make a new path for the XML files if needed
 if(!file_exists($xml_path)) {
@@ -402,6 +431,13 @@ foreach($tivos as $tivo) {
 	$header .= "<script id=\"imagepath\"> \"" . $images . "\" </script>\n";
 	$header .= "<script src=\"" . $tivo['js'] . "\" > </script>\n";
 
+	// Update drive size from the auto drive size file
+	$auto_size_file_name = ("log". delim . $tivo['name'] . "_drive_size.php");
+	$auto_size_gb = adjust_drive_size($auto_size_file_name, $tivo['size_gb']);
+	if($auto_size_gb > $tivo['size_gb']) {
+		$tivo['size_gb'] = $auto_size_gb;
+	}
+
 	$sum_table .= "<tr> "; // start of new row in the table for summary page data
 	if($tivoarray == null){ 			// The DVR is OFF-LINE
 		$content .= "<center><font size=12 face=verdana color=\"red\">This TiVo is currently unavailable</font></center>";
@@ -433,6 +469,13 @@ foreach($tivos as $tivo) {
 			$tivoarray[$i]['episodenumber'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['episodenumber']);
 			$tivoarray[$i]['tvrating'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['tvrating']);
 			$tivoarray[$i]['mpaarating'] = str_replace("&amp;quot;", "&quot;", $tivoarray[$i]['mpaarating']);
+
+			// Creating an index from seriesid with a special case for grouping movies
+			if(substr($tivoarray[$i]['programid'],0,2) === 'MV') {
+				 $tivoarray[$i]['sidindex'] = "MV";
+			} else {
+				 $tivoarray[$i]['sidindex'] = $tivoarray[$i]['seriesid'];
+			}
 
 			// $content .= "<div class=\"programitem\">\n";
 			$content.="<div>\n"; // div.programitem no longer in css file
@@ -541,43 +584,43 @@ foreach($tivos as $tivo) {
 
 			// Collect info for the collapsible tables header
 			// save the series name and count the episodes (a multidimensional array would be better)
-			$groups_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];
-			$groups_count[$tivoarray [$i] ['seriesid']]++;
+			$groups_series[$tivoarray [$i] ['sidindex']] = $tivoarray [$i] ['title'];
+			$groups_count[$tivoarray [$i] ['sidindex']]++;
 
 			// preload a valid date first encounter otherwise date checks get messed up
-			if($groups_newdate[$tivoarray [$i] ['seriesid']] == "")
- 				$groups_newdate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
- 			if($groups_olddate[$tivoarray [$i] ['seriesid']] == "")
- 				$groups_olddate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
+			if($groups_newdate[$tivoarray [$i] ['sidindex']] == "")
+ 				$groups_newdate[$tivoarray [$i] ['sidindex']]=$tivoarray [$i] ['capturedate'];
+ 			if($groups_olddate[$tivoarray [$i] ['sidindex']] == "")
+ 				$groups_olddate[$tivoarray [$i] ['sidindex']]=$tivoarray [$i] ['capturedate'];
 
 			// youngest recording
-			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['seriesid']]) {
-				$groups_newdate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
+			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['sidindex']]) {
+				$groups_newdate[$tivoarray [$i] ['sidindex']] = $tivoarray [$i] ['capturedate'];
 			}
 			// oldest recording
-			if($tivoarray [$i] ['capturedate'] <= $groups_olddate[$tivoarray [$i] ['seriesid']]) {
-				$groups_olddate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
+			if($tivoarray [$i] ['capturedate'] <= $groups_olddate[$tivoarray [$i] ['sidindex']]) {
+				$groups_olddate[$tivoarray [$i] ['sidindex']] = $tivoarray [$i] ['capturedate'];
 			}
 			// End collect info for the collapsible tables header
 
 			// add the TiVo's name for the first field in the sort table
-			$groups[$tivoarray [$i] ['seriesid']] .= "\n<tr>";
+			$groups[$tivoarray [$i] ['sidindex']] .= "\n<tr>";
 			// add shows title to sort table
 
 			// Tool Tip for TiVo name in Groups
-			$groups[$tivoarray [$i] ['seriesid']] .=
+			$groups[$tivoarray [$i] ['sidindex']] .=
 					"\n<td> <span title=\"" . $tivo ['name'] . "\nModel: " . $tivo ['model'] . "\nSize: " . $tivo ['size_gb'] . " GB\">" .
 			 		$tivo ['shorttitle'] ."</span></td>";
 
 			// Tool Tip for status icon in Groups
 			if ($customicon[3] != "") {
-				$groups[$tivoarray [$i] ['seriesid']] .=
+				$groups[$tivoarray [$i] ['sidindex']] .=
 						"\n<td> <span title=\"" . $customicon[3] . "\">".
 						"<center><img src=\"" . $images .
 						$customicon[3] . ".png\" width=\"16\" height=\"16\" alt=\"".$customicon[3]."\"></center></span></td>\n";
 			}
 			else {
-				$groups[$tivoarray [$i] ['seriesid']] .=
+				$groups[$tivoarray [$i] ['sidindex']] .=
 						"\n<td> <span title=\"regular-recording" . "\">".
 						"<center><img src=\"" . $images .
 						"regular-recording.png\" width=\"16\" height=\"16\" alt=\"recording\"></center></span></td>\n";
@@ -585,21 +628,21 @@ foreach($tivos as $tivo) {
 
 			// add shows title to sort table
 			// Tool Tip for series name in Groups
-			$groups[$tivoarray [$i] ['seriesid']] .=
+			$groups[$tivoarray [$i] ['sidindex']] .=
 					"\n<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .		// tooltip
 					$tivoarray [$i] ['title'] ."</span></td>\n";									// title
 
 			// Tool Tip for Episode in Groups
-			$groups[$tivoarray [$i] ['seriesid']] .=
+			$groups[$tivoarray [$i] ['sidindex']] .=
 				 "\n<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">";		// tooltip
 			if($tivoarray [$i] ['episodetitle'] == ""){ 								// No episode title for Movies and Specials
-				$groups[$tivoarray [$i] ['seriesid']] .= "<center> - </center></span> </td>\n";	// still want the ToolTip
+				$groups[$tivoarray [$i] ['sidindex']] .= "<center> - </center></span> </td>\n";	// still want the ToolTip
 			} else {
-				 $groups[$tivoarray [$i] ['seriesid']] .= $tivoarray [$i] ['episodetitle'] . " </span> </td>\n";	// episode title
+				 $groups[$tivoarray [$i] ['sidindex']] .= $tivoarray [$i] ['episodetitle'] . " </span> </td>\n";	// episode title
 			}
 
 			// Tool Tip for Record Date in Groups
-			$groups[$tivoarray [$i] ['seriesid']] .="\n<td sorttable_customkey=\"" .
+			$groups[$tivoarray [$i] ['sidindex']] .="\n<td sorttable_customkey=\"" .
 				// record date index on sortable numeric value
 				tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .			// Sort value
 				// record date viewable format
@@ -609,56 +652,55 @@ foreach($tivos as $tivo) {
 
 			// Tool Tip for ProgramID in groups
 			// Note: ProgramID and Series are for testing may be removed one or both in the future
-			$groups[$tivoarray [$i] ['seriesid']] .=
-				 "\n<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .			// tooltip
+			$groups[$tivoarray [$i] ['sidindex']] .=
+				 "\n<td> <span title=\"Episode number: " . $tivoarray [$i] ['episodenumber'] . "\">" .			// tooltip
 				 $tivoarray [$i] ['programid'] . " </span> </td>\n";						// programid
-
 			// End of Table Row
 
-			$groups[$tivoarray [$i] ['seriesid']] .= "</tr>\n";
+			$groups[$tivoarray [$i] ['sidindex']] .= "</tr>\n";
 
 			// Removed Series ID from table
 			//$groups[$tivoarray [$i] ['seriesid']] .= "<td>" . $tivoarray [$i] ['seriesid'] ."</td>";
 
 			// Collect info for the collapsible tables header for ALL DVRs
 			// save the series name and count the episodes for processing later (a multidimensional array would be better)
-			$folders_series[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['title'];
-			$folders_count[$tivoarray [$i] ['seriesid']]++;
+			$folders_series[$tivoarray [$i] ['sidindex']] = $tivoarray [$i] ['title'];
+			$folders_count[$tivoarray [$i] ['sidindex']]++;
 
 			// preload a valid date first encounter
- 			if($folders_newdate[$tivoarray [$i] ['seriesid']] == "")
- 				$folders_newdate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
- 			if($folders_olddate[$tivoarray [$i] ['seriesid']] == "")
- 				$folders_olddate[$tivoarray [$i] ['seriesid']]=$tivoarray [$i] ['capturedate'];
+ 			if($folders_newdate[$tivoarray [$i] ['sidindex']] == "")
+ 				$folders_newdate[$tivoarray [$i] ['sidindex']]=$tivoarray [$i] ['capturedate'];
+ 			if($folders_olddate[$tivoarray [$i] ['sidindex']] == "")
+ 				$folders_olddate[$tivoarray [$i] ['sidindex']]=$tivoarray [$i] ['capturedate'];
 
 			// youngest recording
-			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['seriesid']]) {
-				$folders_newdate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
+			if($tivoarray [$i] ['capturedate'] >= $groups_newdate[$tivoarray [$i] ['sidindex']]) {
+				$folders_newdate[$tivoarray [$i] ['sidindex']] = $tivoarray [$i] ['capturedate'];
 			}
 			// oldest recording
-			if($tivoarray [$i] ['capturedate'] <= $groups_olddate[$tivoarray [$i] ['seriesid']]) {
-				$folders_olddate[$tivoarray [$i] ['seriesid']] = $tivoarray [$i] ['capturedate'];
+			if($tivoarray [$i] ['capturedate'] <= $groups_olddate[$tivoarray [$i] ['sidindex']]) {
+				$folders_olddate[$tivoarray [$i] ['sidindex']] = $tivoarray [$i] ['capturedate'];
 			}
 			// End collect info for the collapsible tables header for ALL DVRs
 
 			// add the TiVo's name for the first field in the sort table
-			$folders[$tivoarray [$i] ['seriesid']] .= "<tr>";
+			$folders[$tivoarray [$i] ['sidindex']] .= "<tr>";
 			// add show's title to sort table
 
 			// Tool Tip for TiVo name in folders
-			$folders[$tivoarray [$i] ['seriesid']] .=
+			$folders[$tivoarray [$i] ['sidindex']] .=
 			"<td> <span title=\"" . $tivo ['name'] . "\nModel: " . $tivo ['model'] . "\nSize: " . $tivo ['size_gb'] . " GB\">" .
 			$tivo ['shorttitle'] ."</span></td>";
 
 			// Tool Tip for Status icon in folders
 			if ($customicon[3] != "") {
-				$folders[$tivoarray [$i] ['seriesid']] .=
+				$folders[$tivoarray [$i] ['sidindex']] .=
 				"<td> <span title=\"" . $customicon[3] . "\">".
 				"<center><img src=\"" . $images . "" .
 				$customicon[3] . ".png\" width=\"16\" height=\"16\" alt=\"".$customicon[3]."\"></center></span></td>\n";
 			}
 			else {
-				$folders[$tivoarray [$i] ['seriesid']] .=
+				$folders[$tivoarray [$i] ['sidindex']] .=
 				"<td> <span title=\"regular-recording" . "\">".
 				"<center><img src=\"" . $images . "" .
 				"regular-recording.png\" width=\"16\" height=\"16\" alt=\"regular recording\"></center></span></td>\n";
@@ -666,21 +708,21 @@ foreach($tivos as $tivo) {
 
 			// add show's title to sort table
 			// Tool Tip for Title in folders
-			$folders[$tivoarray [$i] ['seriesid']] .=
+			$folders[$tivoarray [$i] ['sidindex']] .=
 			"<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .		// tooltip
 			$tivoarray [$i] ['title'] ."</span></td>";									// title
 
 			// Tool Tip for SeriesID in folders
-			$folders[$tivoarray [$i] ['seriesid']] .=
+			$folders[$tivoarray [$i] ['sidindex']] .=
 			"<td> <span title=\"" . $tivoarray [$i] ['description'] . "\">";			// tooltip
 			if($tivoarray [$i] ['episodetitle'] == ""){ 								// No episode title for Movies and Specials
-				$folders[$tivoarray [$i] ['seriesid']] .= "<center> - </center></span> </td>";	// still want the ToolTip
+				$folders[$tivoarray [$i] ['sidindex']] .= "<center> - </center></span> </td>";	// still want the ToolTip
 			} else {
-				$folders[$tivoarray [$i] ['seriesid']] .= $tivoarray [$i] ['episodetitle'] . " </span> </td>";	// episode title
+				$folders[$tivoarray [$i] ['sidindex']] .= $tivoarray [$i] ['episodetitle'] . " </span> </td>";	// episode title
 			}
 
 			// Tool Tip Record Date in folders
-			$folders[$tivoarray [$i] ['seriesid']] .="<td sorttable_customkey=\"" .
+			$folders[$tivoarray [$i] ['sidindex']] .="<td sorttable_customkey=\"" .
 				// record date index on sortable numeric value
 			tivoDate ( "YmdHi", $tivoarray [$i] ['capturedate'] ) . "\">" .			// Sort value
 				// record date viewable format
@@ -688,10 +730,11 @@ foreach($tivos as $tivo) {
 			"\nDuration: " . mSecsToTime($tivoarray [$i] ['duration']) . "\">" .					// tooltip Channel and Duration
 			tivoDate("g:i a - F j, Y", $tivoarray [$i] ['capturedate'] ) ."</span></td>";	// Date
 
+
 			// Tool Tip for Program ID in folders
 			// Note: ProgramID and Series are for testing may be removed one or both in the future
-			$folders[$tivoarray [$i] ['seriesid']] .=
-				 "<td> <span title=\" Series ID: " . $tivoarray [$i] ['seriesid'] . "\">" .			// tooltip
+			$folders[$tivoarray [$i] ['sidindex']] .=
+				 "<td> <span title=\" Episode number: " . $tivoarray [$i] ['episodenumber'] . "\">" .			// tooltip
 				 $tivoarray [$i] ['programid'] . " </span> </td>";						// programid
 
 			// Removed SeriesID from table
@@ -700,19 +743,9 @@ foreach($tivos as $tivo) {
 		} // loop through tivoarray
 	} // if tivoarray is not null
 
-		// adjust for drive size entered too small use total recorded size
-		$auto_size_gb = $tivo['size_gb'];
-		$auto_size_file_name = ("log". delim . $tivo['name'] . "_drive_size.php");
-
-		if(file_exists($auto_size_file_name)){ // possible new drive size
-			include($auto_size_file_name); // $auto_size_gb = "nnnn";
-			if($auto_size_gb < 0){
-				$auto_size_gb = $tivo['size_gb']; // disable auto size
-			} else {
-				$tivo['size_gb'] = $auto_size_gb;
-			}
-		}
-
+	// adjust for drive size entered too small use total recorded size
+	// Update auto drive size if enabled (- value from file disables)
+	if($auto_size_gb >= 0){
 		if(toGB($totalsize) > $auto_size_gb) {
 			$fpt = @fopen($auto_size_file_name, 'w+');
 			fwrite($fpt, "<?php\n\n");
@@ -732,6 +765,7 @@ foreach($tivos as $tivo) {
 			fclose($fpt);
 			// end of debug logging code
 		}
+	}
 		$totalitems = $tivoarray[0]['totalitems'];
 		$freespace = ((intval(trim($tivo['size_gb']))) * 1024) - toMB($totalsize);
 
@@ -769,48 +803,50 @@ foreach($tivos as $tivo) {
 
 	$fp1 = @fopen($nowPlayingGroups, "w");
 	fwrite($fp1, $header . "<script src=\"" . $mysorttable . "\" type=\"text/javascript\"></script>\n");
-	if($offline == true) {
-		fwrite($fp1, $groups[0]);
-	}
-	else {
-		foreach($groups as $x => $x_value) {	// Process the entire array
-			  fwrite($fp1, "<div><span title= \" Expand: " . $series_count . "\"> " .
-			               "<img src=\"" . $images . "folder.png\" id=\"plusminus" . $series_count . "\" onclick=\"toggleItem(" . $series_count . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"folder\"></span>\n");
+	if ($offline == true) {
+		fwrite ( $fp1, $groups [0] );
+	} else {
+		foreach ( $groups as $x => $x_value ) { // Procress the entire array
+			fwrite ( $fp1, "<div><span title= \" Expand: " . $series_count . "\"> " . "<img src=\"" . $images . "folder.png\" id=\"plusminus" . $series_count . "\" onclick=\"toggleItem(" . $series_count . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"folder\"></span>\n" );
 
-			// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
-			if($x == ""){
-				fwrite($fp1, "<span class=\"name\" > <mark><i><b>" . "Movies and Specials" . "</b></i></mark></span><span class=\"desc\"> (" . $groups_count[$x]);
+			if ($x == "MV") {
+				// Special case for Movies
+				fwrite ( $fp1, "<span class=\"name\" > <mark><i><b>" . "Movies" . "</b></i></mark></span><span class=\"desc\"> (" . $groups_count [$x] );
 			} else {
-				fwrite($fp1, "<span class=\"name\">" . $groups_series[$x] . "</span><span class=\"desc\"> (" . $groups_count[$x]);
+				// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
+				if ($x == "") {
+					fwrite ( $fp1, "<span class=\"name\" > <mark><i><b>" . "Uncategorized" . "</b></i></mark></span><span class=\"desc\"> (" . $groups_count [$x] );
+				} else {
+					fwrite ( $fp1, "<span class=\"name\">" . $folders_series [$x] . "</span><span class=\"desc\"> (" . $groups_count [$x] );
+				}
 			}
 
-			if ($groups_count[$x] > 1) {
-				fwrite($fp1, " episodes; ");
+			if ($groups_count [$x] > 1) {
+				fwrite ( $fp1, " episodes; " );
+			} else {
+				fwrite ( $fp1, " episode; " );
 			}
-			else {
-				fwrite($fp1, " episode; ");
-			}
-			fwrite($fp1, tivoDate("F j, Y, g:i a", $groups_olddate[$x]));
-			if($groups_count[$x] > 1)
-				fwrite($fp1, " &rarr; " . tivoDate("F j, Y, g:i a", $groups_newdate[$x]));
-			fwrite($fp1, ") </span>");
-			fwrite($fp1, "<div class=\"item\" id=\"myTbody" . $series_count++ . "\">\n");
-			fwrite($fp1, "<h4>\n<table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
-			fwrite($fp1, "\n<tr>
+			fwrite ( $fp1, tivoDate ( "F j, Y, g:i a", $groups_olddate [$x] ) );
+			if ($groups_count [$x] > 1)
+				fwrite ( $fp1, " &rarr; " . tivoDate ( "F j, Y, g:i a", $groups_newdate [$x] ) );
+			fwrite ( $fp1, ") </span>" );
+			fwrite ( $fp1, "<div class=\"item\" id=\"myTbody" . $series_count ++ . "\">\n" );
+			fwrite ( $fp1, "<h4>\n<table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n" );
+			fwrite ( $fp1, "\n<tr>
 					<th> TiVo </th>
 					<th class=\"sorttable\"> Status </th>
 					<th class=\"sorttable\"> Series Name </th>
 					<th class=\"sorttable\"> Episode </th>
 					<th class=\"sorttable_numeric\"> Record Date </th>
 					<th class=\"sorttable\"> Program ID </th>
-					</tr>\n");
+					</tr>\n" );
 
-			fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
-			fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
+			fwrite ( $fp1, $x_value . "\n" ); // write the rows of the table collected and formatted in the tivo loop
+			fwrite ( $fp1, "</table>\n</h4></div>\n</div>\n" );
 		}
 	}
 
-	fwrite($fp1, $footer);
+	fwrite ( $fp1, $footer );
 
 	if($nplarchives == 1) {
 	 	// archive loop Update once in the first 15 minutes of the hour
@@ -915,7 +951,7 @@ foreach($tivos as $tivo) {
 	$alltotalsuggestions 	+= $totalsuggestions;
 	$alltotalnumsuggestions += $totalnumsuggestions;
 	$allfreespace 		+= $freespace;
-	$alltotalitems 		+=$totalitems;
+	$alltotalitems 		+= $totalitems;
 	$alltotallength 	+= $totallength;
 	$all_size_gb 		+= $drivesize; //$tivo['size_gb'];
 
@@ -1011,41 +1047,43 @@ $series_count=0;	// Used to create a unique handle for each group
 $fp1 = @fopen($foldershtm, "w");
 fwrite($fp1, $sort_header1);
 
-foreach($folders as $x => $x_value) {	// Procress the entire array
-	// header for each series put in loop to give each table a unique ID from the seriesid
-	fwrite($fp1, "<div><img src=\"" . $images . "folder.png\" id=\"plusminus".$series_count.
-		"\" onclick=\"toggleItem(".$series_count.")\" border=\"0\" width=\"14\" height=\"14\" alt=\"folder\">\n");
+foreach ( $folders as $x => $x_value ) { // Procress the entire array
+                                      // header for each series put in loop to give each table a unique ID from the seriesid
+	fwrite ( $fp1, "<div><img src=\"" . $images . "folder.png\" id=\"plusminus" . $series_count . "\" onclick=\"toggleItem(" . $series_count . ")\" border=\"0\" width=\"14\" height=\"14\" alt=\"folder\">\n" );
 
-	// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
- 	if($x == ""){
-  		fwrite($fp1, "<span class=\"name\" > <mark><i><b>" . "Movies and Specials" . "</b></i></mark></span><span class=\"desc\"> (" . $folders_count[$x]);
- 	} else {
- 		fwrite($fp1, "<span class=\"name\">" . $folders_series[$x] . "</span><span class=\"desc\"> (" . $folders_count[$x]);
-  	}
+	if ($x == "MV") {
+		// Special case for Movies
+		fwrite ( $fp1, "<span class=\"name\" > <mark><i><b>" . "Movies" . "</b></i></mark></span><span class=\"desc\"> (" . $folders_count [$x] );
+	} else {
+		// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
+		if ($x == "") {
+			fwrite ( $fp1, "<span class=\"name\" > <mark><i><b>" . "Uncategorized" . "</b></i></mark></span><span class=\"desc\"> (" . $folders_count [$x] );
+		} else {
+			fwrite ( $fp1, "<span class=\"name\">" . $folders_series [$x] . "</span><span class=\"desc\"> (" . $folders_count [$x] );
+		}
+	}
 
-	if ($folders_count[$x] > 1) {
-		fwrite($fp1, " episodes; ");
+	if ($folders_count [$x] > 1) {
+		fwrite ( $fp1, " episodes; " );
+	} else {
+		fwrite ( $fp1, " episode; " );
 	}
-	else {
-		fwrite($fp1, " episode; ");
-	}
-	fwrite($fp1, tivoDate("F j, Y, g:i a", $folders_olddate[$x]));
-	if($folders_count[$x] > 1)
-		fwrite($fp1, " &rarr; " . tivoDate("F j, Y, g:i a", $folders_newdate[$x]));
-	fwrite($fp1, ") </span>");
-	fwrite($fp1, "<div class=\"item\" id=\"myTbody" . $series_count++ . "\">\n");
-	fwrite($fp1, "<h4>\n<table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n");
-	fwrite($fp1, "	<tr>
+	fwrite ( $fp1, tivoDate ( "F j, Y, g:i a", $folders_olddate [$x] ) );
+	if ($folders_count [$x] > 1)
+		fwrite ( $fp1, " &rarr; " . tivoDate ( "F j, Y, g:i a", $folders_newdate [$x] ) );
+	fwrite ( $fp1, ") </span>" );
+	fwrite ( $fp1, "<div class=\"item\" id=\"myTbody" . $series_count ++ . "\">\n" );
+	fwrite ( $fp1, "<h4>\n<table id=\"$x\" class=\"sortable\" border=\"2\" cellspacing = \"2\" cellpadding = \"4\" align = \"center\" >\n" );
+	fwrite ( $fp1, "	<tr>
 					<th> TiVo </th>
 					<th class=\"sorttable\"> Status </th>
 					<th class=\"sorttable\"> Series Name </th>
 					<th class=\"sorttable\"> Episode </th>
 					<th class=\"sorttable_numeric\"> Record Date </th>
 					<th class=\"sorttable\"> Program ID </th>
-					</tr>\n");
-	fwrite($fp1, $x_value . "\n");	// write the rows of the table collected and formatted in the tivo loop
-	fwrite($fp1, "</table>\n</h4></div>\n</div>\n");
-	//$series_count++;
+					</tr>\n" );
+	fwrite ( $fp1, $x_value . "\n" ); // write the rows of the table collected and formatted in the tivo loop
+	fwrite ( $fp1, "</table>\n</h4></div>\n</div>\n" );
 }
 fwrite($fp1, $allfooter);
 fclose ( $fp1 );
