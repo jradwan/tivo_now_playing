@@ -159,6 +159,9 @@
  *   Moved the read from the auto adjust drive size file to a function
  *    calling it before inserting the DVR's data in the HTML files
  *   
+ * 20180703 jradwan (windracer)
+ *   remove yellow Movies highlight, replace with something more in tune with the color palette
+ *
  *  TODO
  *  {text-align:center;}
  *  Problem with <H4> tag before table
@@ -168,7 +171,7 @@
  *
  *
 */
-$LASTUPDATE = "20170903";
+$LASTUPDATE = "20180703";
 
 ini_set("max_execution_time", "180");
 ini_set("error_log", "tivo_errors.txt");
@@ -811,7 +814,7 @@ foreach($tivos as $tivo) {
 
 			if ($x == "MV") {
 				// Special case for Movies
-				fwrite ( $fp1, "<span class=\"name\" > <mark><i><b>" . "Movies" . "</b></i></mark></span><span class=\"desc\"> (" . $groups_count [$x] );
+				fwrite ( $fp1, "<span class=\"name\" > <mark><b>" . "&nbspMovies&nbsp" . "</b></mark></span><span class=\"desc\"> (" . $groups_count [$x] );
 			} else {
 				// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
 				if ($x == "") {
@@ -1053,7 +1056,7 @@ foreach ( $folders as $x => $x_value ) { // Procress the entire array
 
 	if ($x == "MV") {
 		// Special case for Movies
-		fwrite ( $fp1, "<span class=\"name\" > <mark><i><b>" . "Movies" . "</b></i></mark></span><span class=\"desc\"> (" . $folders_count [$x] );
+		fwrite ( $fp1, "<span class=\"name\" > <mark><b>" . "&nbspMovies&nbsp" . "</b></mark></span><span class=\"desc\"> (" . $folders_count [$x] );
 	} else {
 		// Programs that do not have a seriesID will be grouped and classified as Movies and Specials
 		if ($x == "") {
